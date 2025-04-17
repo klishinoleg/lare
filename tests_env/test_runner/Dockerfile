@@ -1,8 +1,8 @@
-FROM python:3.11
+FROM python:3.12
 
 WORKDIR /tests
 
-COPY ./pytest.ini .
+COPY ./pyproject.toml .
 COPY ./requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 

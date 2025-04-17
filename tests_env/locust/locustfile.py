@@ -9,4 +9,5 @@ class AccountUser(HttpUser):
 
     @task
     def create_account(self) -> None:
+
         self.client.post(account_loader.route + "/", json=account_loader.get_create_payload())
