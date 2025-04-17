@@ -1,23 +1,24 @@
 from __future__ import annotations
 from abc import ABC
-from typing import Generic, Optional, List, Type, TypeVar
+from typing import Optional, List, Type
 
+from application.abstract.exceptions import RepositoryIsNotSet
 from core.di.repository import DIRepository
 from core.enums.repository.types import RepositoryTypes
 from core.helpers.mixins.methods_worker import MethodWorkerMixin
-from domain.abstract import E, EntityCRUDService, EntityNotFoundException, EntityRepository
+from domain.abstract import BaseEntity, EntityCRUDService, EntityNotFoundException, EntityRepository
 from domain.abstract.exceptions import NotDefinedRepositoryException, PDEXC, PermissionDenied
-from application.abstract.dtos import BCIDTO, BILDTO, BIDTO, BUIDTO
+from application.abstract.dtos import BaseCreateItemDTO, BaseUpdateItemDTO, BaseItemDTO, BaseItemsListDTO
 from domain.access_role.enums.roles import AccessRole
 from application.access_control.services import Accessor
 from application.access_control.validators import OwnedByAccountValidator
 from domain.account.entities import AccountEntity
 
 
-class BaseCRUDService(
-    Generic[E],
+class BaseCRUDService[E: BaseEntity, AR: EntityRepository, BIDTO: BaseItemDTO, BILDTO: BaseItemsListDTO,
+                      BCIDTO: BaseCreateItemDTO, BUIDTO: BaseUpdateItemDTO](
     EntityCRUDService[E],
-    MethodWorkerMixin,
+    MethodWorkerMixin[E],
     ABC
 ):
     """
@@ -40,8 +41,8 @@ class BaseCRUDService(
     """
 
     # Repository configuration
-    entity_repository_type: Type[EntityRepository[E]] | None = None
-    repository: EntityRepository[E] | None = None
+    entity_repository_type: Type[AR] | None = None
+    repository: AR | None = None
     repository_type: RepositoryTypes = RepositoryTypes.TORTOISE
 
     # Entity and DTO types
@@ -57,8 +58,8 @@ class BaseCRUDService(
     def __init__(
             self,
             repository_type: RepositoryTypes = RepositoryTypes.TORTOISE,
-            entity_repository_type: Type[EntityRepository[E]] = None
-    ):
+            entity_repository_type: Optional[Type[EntityRepository[E]]] = None
+    ) -> None:
         """
         Initialize the service and resolve its repository using DI.
 
@@ -78,10 +79,10 @@ class BaseCRUDService(
             raise NotDefinedRepositoryException()
         self._set_acces_control_validators()
 
-    def _set_acces_control_validators(self):
+    def _set_acces_control_validators(self) -> None:
         Accessor.register(self.entity_class, OwnedByAccountValidator(), self.entity_permission_denied_exception)
 
-    def set_repository(self, repository_type: RepositoryTypes):
+    def set_repository(self, repository_type: RepositoryTypes) -> None:
         """
         Set or switch the repository implementation.
 
@@ -143,6 +144,8 @@ class BaseCRUDService(
         Returns:
             E: Saved entity.
         """
+        if not self.repository:
+            raise RepositoryIsNotSet()
         await self._run_methods("_create_validate__", entity)
         new_entity = await self._modificate_entity("_create_modificate__", entity)
         return await self.repository.save(new_entity)
@@ -157,6 +160,8 @@ class BaseCRUDService(
         Raises:
             not_found_exception if not found.
         """
+        if not self.repository:
+            raise RepositoryIsNotSet()
         entity = await self.repository.get_by_id(id)
         if entity is None:
             raise self.not_found_exception
@@ -166,6 +171,8 @@ class BaseCRUDService(
         """
         List all entities.
         """
+        if not self.repository:
+            raise RepositoryIsNotSet()
         return await self.repository.list()
 
     async def update(self, entity: E, account: AccountEntity) -> E:
@@ -174,6 +181,8 @@ class BaseCRUDService(
 
         Runs _update_validate__ and _update_modificate__ methods before saving.
         """
+        if not self.repository:
+            raise RepositoryIsNotSet()
         await Accessor.or_raise(entity, account, self.access_role, self.repository_type)
         await self._run_methods("_update_validate__", entity)
         new_entity = await self._modificate_entity("_update_modificate__", entity)
@@ -195,10 +204,8 @@ class BaseCRUDService(
         """
         Delete entity by ID or raise not_found_exception.
         """
+        if not self.repository:
+            raise RepositoryIsNotSet()
         await Accessor.or_raise(entity, account, self.access_role, self.repository_type)
         if not await self.repository.delete(entity.id):
             raise self.not_found_exception
-
-
-# Type alias for CRUD service type
-BCRUDS = TypeVar("BCRUDS", bound=BaseCRUDService)

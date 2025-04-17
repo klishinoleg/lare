@@ -1,11 +1,11 @@
 from abc import ABC
 from typing import Callable, Type
 from pydantic import BaseModel
-from domain.abstract import E
-from application.abstract.dtos import BCIDTO
+from domain.abstract import BaseEntity
+from application.abstract.dtos import BaseCreateItemDTO
 
 
-class BaseLoadTestAPI(ABC):
+class BaseLoadTestAPI[E: BaseEntity, BCIDTO: BaseCreateItemDTO](ABC):
     route: str
     factory: Callable[[], E]
     init_create_dto: Type[BCIDTO]

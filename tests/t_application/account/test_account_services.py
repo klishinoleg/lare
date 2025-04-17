@@ -3,18 +3,19 @@ from application.account.services import AccountService
 from domain.account.interfaces import AccountRepository
 from domain.account.exceptions import NotUniqueUsernameError
 from core.messages.exceptions import GetExMessages
+from domain.account.entities import AccountEntity
 from tests.t_domain.entities.account import AccountFactory
 from tests.t_application.abstract.base_test_crud import BaseCRUDServiceTest
 
 
-class TestAccountService(BaseCRUDServiceTest):
+class TestAccountService(BaseCRUDServiceTest[AccountEntity, AccountRepository, AccountService, AccountFactory]):
     init_service_type = AccountService
     init_entity_repository = AccountRepository
-    factory = staticmethod(AccountFactory)
+    factory = AccountFactory
     _field_for_update = "username"
 
     @pytest.mark.asyncio
-    async def test_check_username_uniqueness(self):
+    async def test_check_username_uniqueness(self) -> None:
         entity = self.factory()
         await self._service.create(entity)
 

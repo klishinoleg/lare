@@ -3,11 +3,11 @@ from importlib import import_module
 from typing import Type, cast
 
 from core.helpers.funcs.strings import camel_to_snake
-from domain.abstract import ER
+from domain.abstract import EntityRepository
 from core.enums.repository.types import RepositoryTypes
 
 
-class DIRepository:
+class DIRepository[ER: EntityRepository]:
     repositories: dict[str, dict[str, Type[ER]]] = {}
 
     @classmethod

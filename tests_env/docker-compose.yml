@@ -34,7 +34,7 @@ services:
       - app
     environment:
       BASE_URL: http://app:8000
-    command: [ "sh", "./run_tests.sh" ]
+    command: ["sh", "./run_tests.sh"]
 
   locust:
     build:

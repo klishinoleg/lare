@@ -13,21 +13,21 @@ from tests.t_application.abstract.base_test_crud import BaseCRUDServiceTest
 from tests.t_domain.entities.book import BookFactory
 
 
-class TestBookService(BaseCRUDServiceTest):
+class TestBookService(BaseCRUDServiceTest[BookEntity, BookRepository, BookService, BookFactory]):
     init_service_type = BookService
     init_entity_repository = BookRepository
-    factory = staticmethod(BookFactory)
+    factory = BookFactory
     _account = None
     _is_languages_ready = False
     _language_service: LanguageService | None = None
 
-    def _get_language_service(self):
+    def _get_language_service(self) -> LanguageService:
         if not self._language_service:
             self._language_service = LanguageService(RepositoryTypes.MOCK)
         return self._language_service
 
     @pytest.fixture(autouse=True)
-    async def create_languages(self):
+    async def create_languages(self) -> None:
         if not self._is_languages_ready:
             languages_entities = load_languages_init_entities()
             language_service = self._get_language_service()
@@ -35,7 +35,7 @@ class TestBookService(BaseCRUDServiceTest):
                 await language_service.create(language)
             self._is_languages_ready = True
 
-    async def _get_fake_entity(self, **kwargs) -> BookEntity:
+    async def _get_fake_entity(self, **kwargs: dict) -> BookEntity:
         language_service = self._get_language_service()
         languages = await language_service.list()
         shuffle(languages)

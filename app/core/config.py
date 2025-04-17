@@ -1,7 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
-from pydantic import ConfigDict
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -28,9 +27,9 @@ class Settings(BaseSettings):
     images_upload_dir: str = ""
     images_upload_url: str = ""
 
-    model_config = ConfigDict(env_file=Path(__file__).parent.parent / ".env", extra='ignore')
+    model_config = SettingsConfigDict(env_file=Path(__file__).parent.parent / ".env", extra='ignore')
 
-    def get_upload_dir(self):
+    def get_upload_dir(self) -> Path:
         return Path(__file__).parent.parent / self.images_upload_dir
 
 

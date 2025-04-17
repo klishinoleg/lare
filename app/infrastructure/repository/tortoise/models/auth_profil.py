@@ -2,6 +2,10 @@ from tortoise import fields
 from .abstract import AbstractModel
 from .mixins import TimestampMixin
 from domain.auth_profile.enums import AuthProviderType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .account import AccountModel
 
 
 class AuthProfileModel(AbstractModel, TimestampMixin):
@@ -25,10 +29,12 @@ class AuthProfileModel(AbstractModel, TimestampMixin):
     """
 
     id = fields.IntField(primary_key=True)
-    account = fields.ForeignKeyField("models.AccountModel", related_name="auth_profiles", on_delete=fields.CASCADE)
+    account: fields.ForeignKeyRelation["AccountModel"] = fields.ForeignKeyField("models.AccountModel",
+                                                                                related_name="auth_profiles",
+                                                                                on_delete=fields.CASCADE)
     provider_type = fields.CharEnumField(AuthProviderType)
     provider_id = fields.CharField(max_length=255)
-    provider_data = fields.JSONField()
+    provider_data: dict = fields.JSONField()
     language_code = fields.CharField(max_length=6, null=True)
 
     class Meta:

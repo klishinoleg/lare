@@ -2,7 +2,8 @@ import pytest
 
 from application.access_control.services import Accessor
 from application.access_control.services.user_creator_service import UserCreatorService
-from application.auth.dtos.password import PasswordRegistrationInitDataDTO, PasswordLoginInitDataDTO
+from application.auth.dtos.password import PasswordRegistrationInitDataDTO, PasswordLoginInitDataDTO, \
+    ChangePasswordInitDataDTO
 from application.auth.services.password_auth_service import PasswordAuthService
 from application.security.token import verify_token
 from core.di.repository import DIRepository
@@ -19,11 +20,11 @@ from tests.t_infrastructure.auth.factory.password import PasswordRegistrationIni
 
 class TestAuthPassword:
     @pytest.fixture(scope="module")
-    def service(self):
+    def service(self) -> PasswordAuthService:
         return PasswordAuthService(RepositoryTypes.MOCK)
 
     @pytest.mark.asyncio
-    async def test_password_registration(self, service: PasswordAuthService):
+    async def test_password_registration(self, service: PasswordAuthService) -> None:
         registration_init_dto: PasswordRegistrationInitDataDTO = PasswordRegistrationInitDataDTOFactory()
         registration_data = await service.register(registration_init_dto)
         user_id_from_token = verify_token(registration_data.token)
@@ -32,7 +33,7 @@ class TestAuthPassword:
         assert user_id_from_token == registration_data.account.id
 
     @pytest.mark.asyncio
-    async def test_password_login(self, service: PasswordAuthService):
+    async def test_password_login(self, service: PasswordAuthService) -> None:
         registration_init_dto: PasswordRegistrationInitDataDTO = PasswordRegistrationInitDataDTOFactory()
         registration_data = await service.register(registration_init_dto)
         login_init_dto: PasswordLoginInitDataDTO = PasswordLoginInitDataDTOFactory(
@@ -44,10 +45,10 @@ class TestAuthPassword:
         assert user_id_from_token == registration_data.account.id
 
     @pytest.mark.asyncio
-    async def test_password_change(self, service: PasswordAuthService):
+    async def test_password_change(self, service: PasswordAuthService) -> None:
         registration_init_dto: PasswordRegistrationInitDataDTO = PasswordRegistrationInitDataDTOFactory()
         registration_data = await service.register(registration_init_dto)
-        change_password_init = ChangePasswordInitDataDTOFactory()
+        change_password_init: ChangePasswordInitDataDTO = ChangePasswordInitDataDTOFactory()
         await service.change_password(change_password_init,
                                       AccountEntity(**registration_data.account.model_dump()))
         login_init_dto: PasswordLoginInitDataDTO = PasswordLoginInitDataDTOFactory(
@@ -62,7 +63,7 @@ class TestAuthPassword:
             await service.login(login_init_dto)
 
     @pytest.mark.asyncio
-    async def test_wrong_repear_password(self, service: PasswordAuthService):
+    async def test_wrong_repear_password(self, service: PasswordAuthService) -> None:
         registration_init_dto: PasswordRegistrationInitDataDTO = PasswordRegistrationInitDataDTOFactory(
             provider_data__repeat_password="wront_repeat_password"
         )
@@ -70,7 +71,7 @@ class TestAuthPassword:
             await service.register(registration_init_dto)
 
     @pytest.mark.asyncio
-    async def test_wrong_login_credentials(self, service: PasswordAuthService):
+    async def test_wrong_login_credentials(self, service: PasswordAuthService) -> None:
         registration_init_dto: PasswordRegistrationInitDataDTO = PasswordRegistrationInitDataDTOFactory()
         await service.register(registration_init_dto)
         login_init_dto: PasswordLoginInitDataDTO = PasswordLoginInitDataDTOFactory(
@@ -80,7 +81,7 @@ class TestAuthPassword:
             await service.login(login_init_dto)
 
     @pytest.mark.asyncio
-    async def test_wrong_username(self, service: PasswordAuthService):
+    async def test_wrong_username(self, service: PasswordAuthService) -> None:
         registration_init_dto: PasswordRegistrationInitDataDTO = PasswordRegistrationInitDataDTOFactory()
         await service.register(registration_init_dto)
         with pytest.raises(AuthProfileAlreadyExistsError,
@@ -88,7 +89,7 @@ class TestAuthPassword:
             await service.register(registration_init_dto)
 
     @pytest.mark.asyncio
-    async def test_superuser(self):
+    async def test_superuser(self) -> None:
         superuser = await UserCreatorService.create_superuser(username="superuser", password="passw",
                                                               public_name="Super User",
                                                               repository_type=RepositoryTypes.MOCK)

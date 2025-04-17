@@ -5,8 +5,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from core.db import init_tortoise, close_tortoise
 from infrastructure.auth.init_auth_providers import register_auth_providers
-from interfaces.fastapi.routers import book_router, auth_router, language_router
-from interfaces.fastapi.exceptions.custom import register_exception_handler
+from interfaces.fast_api.routers import book_router, auth_router, language_router
+from interfaces.fast_api.exceptions.custom import register_exception_handler
 from core.config import settings
 from tortoise_imagefield import Config
 

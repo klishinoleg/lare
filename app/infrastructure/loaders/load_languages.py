@@ -19,14 +19,14 @@ def load_languages_init_entities(limit: int | None = None) -> list[LanguageEntit
     entities: list[LanguageEntity] = []
 
     with file_path.open(encoding="utf-8") as f:
-        reader: list[dict[str, str | int | None]] = csv.DictReader(f)
+        reader: list[dict[str, str | int | None]] = list(csv.DictReader(f))
         n = 0
         for row in reader:
             n += 1
             if limit and n > limit:
                 break
             entities.append(LanguageEntity(
-                id=int(row["id"]),
+                id=int(str(row["id"])),
                 name=row["name"],
                 ordering=int(row.get("ordering") or "100"),
                 original_name=row["original_name"],

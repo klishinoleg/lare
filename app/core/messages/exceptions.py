@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from domain.abstract import E
+from domain.abstract import BaseEntity
 from domain.account.entities import AccountEntity
 from domain.auth_profile.enums import AuthProviderType
 
 
-class GetExMessages:
+class GetExMessages[E: BaseEntity]:
     """
     A centralized helper for formatting common domain exception messages.
 
@@ -15,7 +15,7 @@ class GetExMessages:
     """
 
     @staticmethod
-    def username_already_exists(username) -> str:
+    def username_already_exists(username: str = "") -> str:
         return "Username {} already exists".format(username)
 
     @staticmethod
@@ -35,19 +35,19 @@ class GetExMessages:
         return "Account not found {}".format(str(info)).strip()
 
     @staticmethod
-    def telegram_invalid_hash():
+    def telegram_invalid_hash() -> str:
         return "Invalid Telegram hash"
 
     @staticmethod
-    def telegram_auth_expired():
+    def telegram_auth_expired() -> str:
         return "Telegram auth expired"
 
     @staticmethod
-    def password_auth_profile_not_found():
+    def password_auth_profile_not_found() -> str:
         return "Password profile not found"
 
     @staticmethod
-    def invalid_username_or_password():
+    def invalid_username_or_password() -> str:
         return "Invalid username or password"
 
     @staticmethod
@@ -55,5 +55,5 @@ class GetExMessages:
         return "Access denied for {} by {}".format(type(entity).__name__, account.username)
 
     @staticmethod
-    def wrong_repeat_password():
+    def wrong_repeat_password() -> str:
         return "Wrong repeat password"

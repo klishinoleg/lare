@@ -68,7 +68,7 @@ def create_fake_telegram_provider_data() -> TelegramProviderDataDTO:
     Generates a query string and HMAC hash for Telegram WebApp login flow,
     from a structured DTO. Returns full init_data and raw object.
     """
-    init_data_unsafe = TelegramWebAppInitDTOFactory()
+    init_data_unsafe: TelegramWebAppInitDTO = TelegramWebAppInitDTOFactory()
     raw_data = {
         k: v for k, v in init_data_unsafe.model_dump(exclude_none=True, exclude={"hash", "signature"}).items()
     }

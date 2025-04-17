@@ -12,7 +12,7 @@ from domain.account.entities import AccountEntity
 class UserCreatorService:
     @staticmethod
     async def create_superuser(
-            username: str, password: str, public_name: str, language_code="en",
+            username: str, password: str, public_name: str, language_code: str = "en",
             repository_type: RepositoryTypes = RepositoryTypes.TORTOISE) -> AccountEntity:
         access_role_repository = DIRepository.get_repository(AccessRoleRepository, repository_type)()
         password_auth_service = PasswordAuthService(repository_type=repository_type)

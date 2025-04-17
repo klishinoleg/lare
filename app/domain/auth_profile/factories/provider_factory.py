@@ -21,7 +21,7 @@ class AuthProviderFactory:
     _providers: dict[AuthProviderType, Type[BaseAuthProvider]] = {}
 
     @classmethod
-    def register(cls, provider_cls: Type[BaseAuthProvider]):
+    def register(cls, provider_cls: Type[BaseAuthProvider]) -> None:
         """
         Register a new provider class with the factory.
 

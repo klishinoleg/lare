@@ -26,6 +26,6 @@ class ChapterEntity(BaseEntity, TimestampMixin):
     name: str
     book_id: int
     account_id: int
-    source_url: str | None = field(default=False, repr=False)
+    source_url: str | None = field(default=None, repr=False)
     position: int = field(default=50, repr=False)
     is_ready: bool = field(default=False)

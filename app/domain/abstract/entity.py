@@ -1,8 +1,7 @@
 from __future__ import annotations
-
 from dataclasses import dataclass, asdict, field
 from abc import ABC
-from typing import TypeVar
+from typing import Any
 
 
 @dataclass
@@ -30,7 +29,7 @@ class BaseEntity(ABC):
 
     id: int | None = field(default=None)
 
-    def to_dict(self, exclude_id=False) -> dict:
+    def to_dict(self, exclude_id: bool = False) -> dict:
         """
         Convert the entity to a dictionary.
 
@@ -54,7 +53,7 @@ class BaseEntity(ABC):
         """
         return self.id is None
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """
         Prevent reassignment of 'id' after it is initially set.
 
@@ -64,7 +63,3 @@ class BaseEntity(ABC):
         if name == "id" and getattr(self, "id", None) is not None:
             return
         super().__setattr__(name, value)
-
-
-# Generic type for entity constraints
-E = TypeVar('E', bound=BaseEntity)

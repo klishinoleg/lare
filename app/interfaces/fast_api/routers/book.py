@@ -6,7 +6,7 @@ from application.book.dtos.book import (
     BookDTO,
     BookListDTO
 )
-from interfaces.fastapi.routers.abstract.crud import BaseCRUDApiViewSet
+from interfaces.fast_api.routers.abstract.crud import BaseCRUDApiViewSet
 
 router = APIRouter(prefix="/book", tags=["Books"])
 
