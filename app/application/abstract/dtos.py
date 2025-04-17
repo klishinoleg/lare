@@ -1,0 +1,33 @@
+from abc import ABC
+from typing import TypeVar, Self
+
+from pydantic import BaseModel
+
+
+class BaseModelWithSafeFields(BaseModel):
+    @classmethod
+    def create_from_dict(cls, data: dict) -> Self:
+        return cls(**{k: v for k, v in data.items() if k in cls.model_fields})
+
+
+class BaseCreateItemDTO(ABC, BaseModelWithSafeFields):
+    ...
+
+
+class BaseUpdateItemDTO(ABC, BaseModelWithSafeFields):
+    ...
+
+
+class BaseItemsListDTO(ABC, BaseModelWithSafeFields):
+    id: int
+
+
+class BaseItemDTO(ABC, BaseModelWithSafeFields):
+    id: int
+
+
+BDTO = TypeVar("BDTO", bound=BaseModelWithSafeFields)
+BCIDTO = TypeVar('BCIDTO', bound=BaseCreateItemDTO)
+BUIDTO = TypeVar('BUIDTO', bound=BaseUpdateItemDTO)
+BILDTO = TypeVar('BILDTO', bound=BaseItemsListDTO)
+BIDTO = TypeVar('BIDTO', bound=BaseItemDTO)

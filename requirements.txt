@@ -1,0 +1,35 @@
+# Core
+fastapi~=0.115.12
+uvicorn[standard]~=0.34.0
+
+# ORM
+tortoise-orm~=0.24.2
+aiosqlite~=0.19.0
+asyncpg>=0.30.0
+
+
+# Settings
+pydantic-settings~=2.8.1
+python-dotenv~=1.0.1
+
+# Async
+async-exit-stack~=1.0.1
+async-generator~=1.10
+
+# Testing
+pytest~=8.3.5
+pytest-asyncio~=0.26.0
+httpx~=0.28.1
+locust~=2.34.1
+
+# Test generation data
+faker~=37.1.0
+factory_boy~=3.3.3
+
+pydantic~=2.11.3
+
+tortoise~=0.1.1
+starlette~=0.46.1
+
+python-jose[cryptography]~=3.4.0
+bcrypt~=4.3.0

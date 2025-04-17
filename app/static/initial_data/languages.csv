@@ -1,0 +1,193 @@
+id,name,original_name,slug,code,ordering
+1,Abkhaz,Аҧсуа,ab,ab
+2,Acehnese,Acèh,ace,ac
+3,Acholi,Lwo,ach,ac
+4,Afrikaans,Afrikaans,af,af
+5,Albanian,Shqip,sq,sq
+6,Alur,Alur,alz,al
+7,Amharic,አማርኛ,am,am
+8,Arabic,العربية,ar,ar,50
+9,Armenian,Հայերեն,hy,hy,50
+10,Assamese,অসমীয়া,as,as
+11,Awadhi,अवधी,awa,aw
+12,Aymara,Aymar aru,ay,ay
+13,Azerbaijani,Azərbaycan,az,az,50
+14,Balinese,ᬩᬲᬩᬮᬶ,ban,ba
+15,Bambara,Bamanankan,bm,bm
+16,Bashkir,Башҡорт теле,ba,ba
+17,Basque,Euskara,eu,eu
+18,Batak Karo,Karo,btx,bt
+19,Batak Simalungun,Simalungun,bts,bt
+20,Batak Toba,Hata Batak Toba,bbc,bb
+21,Belarusian,Беларуская,be,be,50
+22,Bemba,ChiBemba,bem,be
+23,Bengali,বাংলা,bn,bn
+24,Betawi,Bahasa Betawi,bew,be
+25,Bhojpuri,भोजपुरी,bho,bh
+26,Bikol,Bikol,bik,bi
+27,Bosnian,Bosanski,bs,bs,50
+28,Breton,Brezhoneg,br,br
+29,Bulgarian,Български,bg,bg,20
+30,Buryat,Буряад,bua,bu
+31,Cantonese,粵語,yue,yu
+32,Catalan,Català,ca,ca
+33,Cebuano,Binisaya,ceb,ce
+34,Chichewa (Nyanja),Chichewa,ny,ny
+35,Chinese (Simplified),中文,zh-CN,zh,10
+36,Chinese (Traditional),繁體中文,zh-TW,zh
+37,Chuvash,Чӑваш,cv,cv
+38,Corsican,Corsu,co,co
+39,Crimean Tatar,Qırımtatarca,crh,cr
+40,Croatian,Hrvatski,hr,hr,20
+41,Czech,Čeština,cs,cs,20
+42,Danish,Dansk,da,da,20
+43,Dinka,Thuɔŋjäŋ,din,di
+44,Divehi,ދިވެހި,dv,dv
+45,Dutch,Nederlands,nl,nl,20
+46,Dzongkha,རྫོང་ཁ,dz,dz
+47,English,English,en,en,1
+48,Esperanto,Esperanto,eo,eo
+49,Estonian,Eesti,et,et,20
+50,Ewe,Eʋegbe,ee,ee
+51,Fijian,Vosa Vakaviti,fj,fj
+52,Filipino (Tagalog),Filipino,fil,fi,50
+53,Finnish,Suomi,fi,fi
+54,French,Français,fr,fr,5
+55,French (French),Français,fr-FR,fr
+56,French (Canadian),Français (Canada),fr-CA,fr
+57,Frisian,Frysk,fy,fy
+58,Fulfulde,Fulfulde,ff,ff
+59,Ga,Ga,gaa,ga
+60,Galician,Galego,gl,gl
+61,Ganda (Luganda),Luganda,lg,lg
+62,Georgian,ქართული,ka,ka,50
+63,German,Deutsch,de,de,5
+64,Greek,Ελληνικά,el,el,10
+65,Guarani,Avañe'ẽ,gn,gn
+66,Gujarati,ગુજરાતી,gu,gu
+67,Haitian Creole,Kreyòl Ayisyen,ht,ht
+68,Hakha Chin,Hakha,cnh,cn
+69,Hausa,Hausa,ha,ha
+70,Hawaiian,ʻŌlelo Hawaiʻi,haw,ha
+71,Hebrew,עברית,iw,iw
+72,Hiligaynon,Hiligaynon,hil,hi
+73,Hindi,हिन्दी,hi,hi,5
+74,Hmong,Hmong,hmn,hm
+75,Hungarian,Magyar,hu,hu
+76,Hunsrik,Hunsrik,hrx,hr
+77,Icelandic,Íslenska,is,is
+78,Igbo,Igbo,ig,ig
+79,Iloko,Iloko,ilo,il
+80,Indonesian,Bahasa Indonesia,id,id,10
+81,Irish,Gaeilge,ga,ga,10
+82,Italian,Italiano,it,it,5
+83,Japanese,日本語,ja,ja,5
+84,Javanese,Basa Jawa,jw,jw
+85,Kannada,ಕನ್ನಡ,kn,kn
+86,Kapampangan,Kapampangan,pam,pa
+87,Kazakh,Қазақ тілі,kk,kk,20
+88,Khmer,ភាសាខ្មែរ,km,km
+89,Kiga,Kiga,cgg,cg
+90,Kinyarwanda,Ikinyarwanda,rw,rw
+91,Kituba,Kituba,ktu,kt
+92,Konkani,Konkani,gom,go
+93,Korean,한국어,ko,ko,20
+94,Krio,Krio,kri,kr
+95,Kurdish (Kurmanji),Kurdî,ku,ku
+96,Kurdish (Sorani),کوردی,ckb,ck
+97,Kyrgyz,Кыргызча,ky,ky
+98,Lao,ພາສາລາວ,lo,lo
+99,Latgalian,Latgalīšu,ltg,lt
+100,Latin,Latina,la,la
+101,Latvian,Latviešu,lv,lv,50
+102,Ligurian,Ligure,lij,li
+103,Limburgan,Limburgs,li,li
+104,Lingala,Lingála,ln,ln
+105,Lithuanian,Lietuvių,lt,lt
+106,Lombard,Lombard,lmo,lm
+107,Luo,Dholuo,luo,lu
+108,Luxembourgish,Lëtzebuergesch,lb,lb
+109,Macedonian,Македонски,mk,mk,50
+110,Maithili,मैथिली,mai,ma
+111,Makassar,Basa Mangkasara,mak,ma
+112,Malagasy,Malagasy,mg,mg
+113,Malay,Bahasa Melayu,ms,ms
+114,Malay (Jawi),بهاس ملايو,ms-Arab,ms
+115,Malayalam,മലയാളം,ml,ml
+116,Maltese,Malti,mt,mt
+117,Maori,Te Reo Māori,mi,mi
+118,Marathi,मराठी,mr,mr
+119,Meadow Mari,Meadow Mari,chm,ch
+120,Meiteilon (Manipuri),ꯃꯤꯇꯩꯂꯣꯟ,mni-Mtei,mn
+121,Minang,Baso Minang,min,mi
+122,Mizo,Mizo tawng,lus,lu
+123,Mongolian,Монгол,mn,mn
+124,Myanmar (Burmese),မြန်မာဘာသာ,my,my
+125,Ndebele (South),isiNdebele,nr,nr
+126,Nepalbhasa (Newari),Newar,new,ne
+127,Nepali,नेपाली,ne,ne
+128,Northern Sotho (Sepedi),Sepedi,nso,ns
+129,Norwegian,Norsk,no,no,20
+130,Nuer,Thok Naath,nus,nu
+131,Occitan,Occitan,oc,oc
+132,Odia (Oriya),ଓଡ଼ିଆ,or,or
+133,Oromo,Afaan Oromoo,om,om
+134,Pangasinan,Pangasinan,pag,pa
+135,Papiamento,Papiamentu,pap,pa
+136,Pashto,پښتو,ps,ps
+137,Persian,فارسی,fa,fa
+138,Polish,Polski,pl,pl,20
+139,Portuguese,Português,pt,pt,5
+140,Portuguese (Portugal),Português (Portugal),pt-PT,pt
+141,Portuguese (Brazil),Português (Brasil),pt-BR,pt
+142,Punjabi,ਪੰਜਾਬੀ,pa,pa
+143,Punjabi (Shahmukhi),پنجابی,pa-Arab,pa
+144,Quechua,Runa Simi,qu,qu
+145,Romani,Romani,rom,ro
+146,Romanian,Română,ro,ro
+147,Rundi,Ikirundi,rn,rn
+148,Russian,Русский,ru,ru,5
+149,Samoan,Gagana Sāmoa,sm,sm
+150,Sango,Sängö,sg,sg
+151,Sanskrit,संस्कृतम्,sa,sa
+152,Scots Gaelic,Gàidhlig,gd,gd
+153,Serbian,Српски,sr,sr,20
+154,Sesotho,Sesotho,st,st
+155,Seychellois Creole,Kreol Seselwa,crs,cr
+156,Shan,ၵႂၢမ်းတႆ,shn,sh
+157,Shona,ChiShona,sn,sn
+158,Sicilian,Sicilianu,scn,sc
+159,Silesian,Ślōnski,szl,sz
+160,Sindhi,سنڌي,sd,sd
+161,Sinhala (Sinhalese),සිංහල,si,si
+162,Slovak,Slovenčina,sk,sk,20
+163,Slovenian,Slovenščina,sl,sl,20
+164,Somali,Soomaali,so,so
+165,Spanish,Español,es,es,5
+166,Sundanese,Basa Sunda,su,su
+167,Swahili,Kiswahili,sw,sw
+168,Swati,siSwati,ss,ss
+169,Swedish,Svenska,sv,sv,10
+170,Tajik,тоҷикӣ,tg,tg
+171,Tamil,தமிழ்,ta,ta
+172,Tatar,татарча,tt,tt
+173,Telugu,తెలుగు,te,te
+174,Tetum,Tetun,tet,te
+175,Thai,ไทย,th,th,20
+176,Tigrinya,ትግርኛ,ti,ti
+177,Tsonga,Xitsonga,ts,ts
+178,Tswana,Setswana,tn,tn
+179,Turkish,Türkçe,tr,tr,10
+180,Turkmen,Türkmen,tk,tk,50
+181,Twi (Akan),Twi,ak,ak
+182,Ukrainian,Українська,uk,uk
+183,Urdu,اردو,ur,ur
+184,Uyghur,ئۇيغۇرچە,ug,ug
+185,Uzbek,Oʻzbek,uz,uz
+186,Vietnamese,Tiếng Việt,vi,vi,20
+187,Welsh,Cymraeg,cy,cy
+188,Xhosa,isiXhosa,xh,xh
+189,Yiddish,ייִדיש,yi,yi
+190,Yoruba,Yorùbá,yo,yo
+191,Yucatec Maya,Maaya T'aan,yua,yu
+192,Zulu,isiZulu,zu,zu

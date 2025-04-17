@@ -1,0 +1,51 @@
+name: lare_tests
+services:
+  db:
+    image: postgres:latest
+    container_name: lare_test_db
+    restart: always
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test_db
+    expose:
+      - "5432"
+    volumes:
+      - test_pg_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: ..
+      dockerfile: tests_env/app/Dockerfile
+    container_name: lare_test_app
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://test:test@db:5432/test_db
+    expose:
+      - "8000"
+
+  test_runner:
+    build:
+      context: ..
+      dockerfile: tests_env/test_runner/Dockerfile
+    container_name: lare_test_runner
+    depends_on:
+      - app
+    environment:
+      BASE_URL: http://app:8000
+    command: [ "sh", "./run_tests.sh" ]
+
+  locust:
+    build:
+      context: ..
+      dockerfile: tests_env/locust/Dockerfile
+    working_dir: /locust
+    environment:
+      PYTHONPATH: /locust
+    ports:
+      - "8089:8089"
+    volumes: []
+
+volumes:
+  test_pg_data:
