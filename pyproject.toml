@@ -21,6 +21,14 @@ strict_optional = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 
+[[tool.mypy.overrides]]
+module = "aiofiles"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "aiofiles.os"
+ignore_missing_imports = true
+
 [tool.flake8]
 max-line-length = 120
 extend-ignore = [

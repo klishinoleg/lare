@@ -34,3 +34,10 @@ starlette~=0.46.1
 python-jose[cryptography]~=3.4.0
 bcrypt~=4.3.0
 tortoise_imagefield~= 0.1.7
+
+faststream~=0.5.39
+regex~=2024.11.6
+
+aiofiles~=24.1.0
+types-aiofiles~=24.1.0.20250326
+dataclass_toolkit~=0.1.2

@@ -26,11 +26,20 @@ class Settings(BaseSettings):
     secret_key: str = ""
     images_upload_dir: str = ""
     images_upload_url: str = ""
+    kafka_broker_url: str = ""
+    event_data_dir: str = ""
 
     model_config = SettingsConfigDict(env_file=Path(__file__).parent.parent / ".env", extra='ignore')
 
     def get_upload_dir(self) -> Path:
-        return Path(__file__).parent.parent / self.images_upload_dir
+        path = Path(__file__).parent.parent / self.images_upload_dir
+        path.mkdir(exist_ok=True)
+        return path
+
+    def get_event_data_dir(self, subdir: str, file_name: str) -> Path:
+        dir_path = Path(__file__).parent.parent / self.event_data_dir / subdir
+        dir_path.mkdir(exist_ok=True)
+        return dir_path / file_name
 
 
 # Global instance of settings to be used throughout the project

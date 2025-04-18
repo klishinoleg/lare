@@ -17,6 +17,12 @@ class WordChapterModel(AbstractModel):
     ORM model linking a word to a specific chapter and position.
     """
 
+    if TYPE_CHECKING:
+        word_id: int
+        chapter_id: int
+        phrase_id: int | None
+        segment_id: int | None
+
     id = fields.IntField(primary_key=True)
     name = fields.CharField(max_length=255)
     word: fields.ForeignKeyRelation["WordModel"] = fields.ForeignKeyField(

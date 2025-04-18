@@ -41,4 +41,5 @@ class TestBookService(BaseCRUDServiceTest[BookEntity, BookRepository, BookServic
         shuffle(languages)
         language_id = languages[0].id
         main_account = await self._get_main_account()
-        return await super()._get_fake_entity(account_id=main_account.id, language_id=language_id)
+        return await super()._get_fake_entity(
+            account_id=main_account.id, language_id=language_id)  # type: ignore[arg-type]
