@@ -2,7 +2,7 @@ from tortoise import Tortoise, connections
 from core.config import settings
 
 
-async def init_tortoise(with_schema=True):
+async def init_tortoise(with_schema: bool = True) -> None:
     """
     Initialize the Tortoise ORM with the configured database.
 
@@ -21,7 +21,7 @@ async def init_tortoise(with_schema=True):
         await Tortoise.generate_schemas()
 
 
-async def close_tortoise():
+async def close_tortoise() -> None:
     """
     Close all open Tortoise ORM database connections.
 

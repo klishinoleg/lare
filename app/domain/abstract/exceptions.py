@@ -26,15 +26,15 @@ class DomainValidationException(Exception):
         field (str): Optional name of the field or property that caused the failure.
     """
 
-    def __init__(self, message: str = "Domain exception", *args, field: str = ""):
-        self.message = message
-        self.field = field
+    def __init__(self, message: str = "Domain exception", *args: tuple, field: str = "") -> None:
+        self.message: str = message
+        self.field: str = field
         super().__init__(self.message, *args)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.message
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message
 
 

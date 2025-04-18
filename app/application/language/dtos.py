@@ -1,5 +1,5 @@
 from pydantic import Field
-from app.application.abstract.dtos import (
+from application.abstract.dtos import (
     BaseCreateItemDTO, BaseUpdateItemDTO, BaseItemsListDTO, BaseItemDTO
 )
 

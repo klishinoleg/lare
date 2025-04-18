@@ -6,14 +6,14 @@ from collections import defaultdict
 from core.di.repository import DIRepository
 from core.enums.repository.types import RepositoryTypes
 from core.messages.exceptions import GetExMessages
-from domain.abstract import BaseEntity, E, PermissionDenied
+from domain.abstract import BaseEntity, PermissionDenied
 from domain.access_role.enums.roles import AccessRole
 from domain.access_role.interfaces.repository import AccessRoleRepository
 from domain.account.entities import AccountEntity
-from domain.access_role.interfaces.validator import BaseAccessValidator, BAL
+from domain.access_role.interfaces.validator import BaseAccessValidator
 
 
-class Accessor:
+class Accessor[BAL: BaseAccessValidator, E: BaseEntity]:
     """
     Universal access control service for domain entities.
 
@@ -70,7 +70,7 @@ class Accessor:
         validators = cls._validators.get(type(entity))
         if not validators:
             return False
-        if len(cls._validators.get(type(entity))) == 0:
+        if len(validators) == 0:
             return True
         for validator in validators:
             if await validator.has_access(entity, account):

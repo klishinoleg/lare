@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Generic, Optional, List, TypeVar
-from ..entity import E
+from typing import Optional, List
+from domain.abstract.entity import BaseEntity
 
 
-class EntityCRUDService(ABC, Generic[E]):
+class EntityCRUDService[E: BaseEntity](ABC):
     """
     Abstract base class for defining CRUD operations for domain entities.
 
@@ -92,7 +92,3 @@ class EntityCRUDService(ABC, Generic[E]):
             bool: True if the entity was deleted.
         """
         ...
-
-
-# Type variable for referencing any subclass of EntityCRUDService
-ECRUDS = TypeVar('ECRUDS', bound=EntityCRUDService)

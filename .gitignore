@@ -31,3 +31,5 @@ coverage.xml
 *.py,cover
 .cache
 pytest_cache/
+/help/
+/node_modules/

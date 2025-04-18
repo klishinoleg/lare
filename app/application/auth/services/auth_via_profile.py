@@ -3,7 +3,7 @@ from core.enums.repository.types import RepositoryTypes
 from core.di.repository import DIRepository
 from domain.account.interfaces import AccountRepository
 from domain.auth_profile.factories.provider_factory import AuthProviderFactory
-from application.auth.dtos import AuthInitDataDTO, AuthResponseDTO, AUIDDTO, AuthProfileDTO
+from application.auth.dtos import AuthResponseDTO, AUIDDTO, AuthProfileDTO
 from domain.account.entities import AccountEntity
 from application.account.dtos import AccountDTO
 from domain.auth_profile.interfaces.repository import AuthProfileRepository

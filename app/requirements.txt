@@ -7,3 +7,4 @@ pytest-asyncio~=0.26.0
 httpx~=0.28.1
 python-jose[cryptography]~=3.4.0
 bcrypt~=4.3.0
+tortoise_imagefield~= 0.1.7

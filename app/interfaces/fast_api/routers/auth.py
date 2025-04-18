@@ -8,15 +8,15 @@ from application.auth.dtos.password import PasswordRegistrationInitDataDTO, Pass
     ChangePasswordInitDataDTO, PasswordRegistrationDTO, PasswordLoginDTO, ChangePasswordDTO
 from domain.auth_profile.enums import AuthProviderType
 from infrastructure.auth.dtos.telegram import TelegramAuthInitDataDTO, TelegramProviderDataDTO
-from interfaces.fastapi.deps.account import get_current_account
-from interfaces.fastapi.deps.auth import get_auth_service, get_password_service
-from fastapi import APIRouter
+from interfaces.fast_api.deps.account import get_current_account
+from interfaces.fast_api.deps.auth import get_auth_service, get_password_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/telegram/", response_model=AuthResponseDTO)
-async def auth_via_telegram(data: TelegramProviderDataDTO, service: AuthViaProfileService = Depends(get_auth_service)):
+async def auth_via_telegram(data: TelegramProviderDataDTO,
+                            service: AuthViaProfileService = Depends(get_auth_service)) -> AuthResponseDTO:
     """
     Authenticate or register user via Telegram WebApp.
 
@@ -41,7 +41,7 @@ async def auth_via_telegram(data: TelegramProviderDataDTO, service: AuthViaProfi
 
 
 @router.get("/me/", response_model=AccountDTO)
-async def get_me(account: AccountEntity = Depends(get_current_account)):
+async def get_me(account: AccountEntity = Depends(get_current_account)) -> AccountDTO:
     """
     Get current authenticated user info.
 
@@ -55,7 +55,7 @@ async def get_me(account: AccountEntity = Depends(get_current_account)):
 async def get_profiles(
         account: AccountEntity = Depends(get_current_account),
         service: AuthViaProfileService = Depends(get_auth_service)
-):
+) -> list[AuthProfileDTO]:
     """
     Get current authenticated user profiles.
     :param service:
@@ -69,7 +69,7 @@ async def get_profiles(
 async def register_user(
         data: PasswordRegistrationDTO,
         service: PasswordAuthService = Depends(get_password_service),
-):
+) -> AuthResponseDTO:
     init_dto = PasswordRegistrationInitDataDTO(provider_data=data)
     return await service.register(init_dto)
 
@@ -78,7 +78,7 @@ async def register_user(
 async def login_user(
         data: PasswordLoginDTO,
         service: PasswordAuthService = Depends(get_password_service),
-):
+) -> AuthResponseDTO:
     init_data = PasswordLoginInitDataDTO(provider_data=data)
     return await service.login(init_data)
 
@@ -88,6 +88,6 @@ async def change_password(
         data: ChangePasswordDTO,
         account: AccountEntity = Depends(get_current_account),
         service: PasswordAuthService = Depends(get_password_service)
-):
+) -> AuthResponseDTO:
     init_dto = ChangePasswordInitDataDTO(provider_data=data)
     return await service.change_password(init_dto, account)

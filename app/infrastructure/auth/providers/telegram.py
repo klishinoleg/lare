@@ -2,7 +2,7 @@ from __future__ import annotations
 from core.messages.exceptions import GetExMessages
 from domain.auth_profile.entities import AuthProfileEntity
 from domain.auth_profile.enums import AuthProviderType
-from domain.auth_profile.interfaces.provider import BaseAuthProvider, BM
+from domain.auth_profile.interfaces.provider import BaseAuthProvider
 from domain.auth_profile.exceptions import AuthProfileInvalidCredentialsError
 from infrastructure.auth.dtos.telegram import TelegramProviderDataDTO
 from infrastructure.auth.utils.telegram import validate_telegram_init_data

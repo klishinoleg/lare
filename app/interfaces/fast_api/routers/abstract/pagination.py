@@ -1,22 +1,20 @@
-from typing import TypeVar, Generic, Type, List, Optional
+from typing import Type, List
 from pydantic import BaseModel, Field
 from fastapi import Query
 from domain.abstract.entity import BaseEntity
 
-T = TypeVar("T", bound=BaseModel)
-
 
 class PageParams:
     def __init__(
-        self,
-        page: int = Query(1, description="Page number (starting from 1)"),
-        page_size: int = Query(20, le=100, description="Number of items per page")
+            self,
+            page: int = Query(1, description="Page number (starting from 1)"),
+            page_size: int = Query(20, le=100, description="Number of items per page")
     ):
         self.page = page
         self.page_size = page_size
 
 
-class PageDTO(BaseModel, Generic[T]):
+class PageDTO[T: BaseModel](BaseModel):
     count: int = Field(..., description="Total number of items")
     page: int = Field(..., description="Current page number")
     page_size: int = Field(..., description="Items per page")
@@ -24,11 +22,11 @@ class PageDTO(BaseModel, Generic[T]):
     results: List[T] = Field(..., description="List of results")
 
 
-async def paginate(
-    items: list[BaseEntity],
-    schema: Type[T],
-    params: PageParams,
-) -> PageDTO[T]:
+async def paginate[T: BaseModel](
+        items: list[BaseEntity],
+        schema: Type[T],
+        params: PageParams,
+) -> PageDTO:
     total_count = len(items)
 
     if params.page_size == 0:

@@ -1,21 +1,20 @@
 from __future__ import annotations
 from application.auth.dtos import AuthResponseDTO
-from domain.account.entities import AccountEntity
 from .base_client import BaseClientTest
-from typing import Optional, Callable, Type, Generic
+from typing import Optional, Type
 from fastapi.testclient import TestClient
 from httpx import Response
 from time import sleep
-from domain.abstract import E
-from application.abstract.dtos import BUIDTO, BCIDTO, BILDTO, BIDTO
+from domain.abstract import BaseEntity
+from application.abstract.dtos import BaseItemDTO, BaseItemsListDTO, BaseCreateItemDTO, BaseUpdateItemDTO
+from factory import Factory
 
-FactoryType = Callable[[], E]
 
-
-class BaseAPICRUDTest(Generic[E], BaseClientTest):
+class BaseAPICRUDTest[E: BaseEntity, F: Factory, BIDTO:BaseItemDTO, BILDTO: BaseItemsListDTO, BCIDTO: BaseCreateItemDTO,
+                      BUIDTO: BaseUpdateItemDTO](BaseClientTest):
     route: str  # example: "/account"
     # Factory method to generate test entities
-    factory: FactoryType
+    factory: Type[F]
     init_create_dto: Type[BCIDTO]
     init_update_dto: Type[BUIDTO]
     init_list_dto: Type[BILDTO]
@@ -24,7 +23,7 @@ class BaseAPICRUDTest(Generic[E], BaseClientTest):
     _updated_at_field = "updated_at"
 
     @staticmethod
-    def _get_auth_headers(auth_user_data: AuthResponseDTO):
+    def _get_auth_headers(auth_user_data: AuthResponseDTO) -> dict:
         return {"Authorization": f"Bearer {auth_user_data.token}"}
 
     def _post(self, client: TestClient, data: BCIDTO, headers: dict | None = None) -> Response:
@@ -43,15 +42,15 @@ class BaseAPICRUDTest(Generic[E], BaseClientTest):
     def _delete(self, client: TestClient, id: int, headers: dict | None = None) -> Response:
         return client.delete(f"{self.route}/{id}", headers=headers)
 
-    def _create_entity(self, client: TestClient, auth_user_data) -> tuple[E, Response]:
+    def _create_entity(self, client: TestClient, auth_user_data: AuthResponseDTO) -> tuple[E, Response]:
         entity = self._from_factory(client, auth_user_data)
         create_dto = self.init_create_dto.create_from_dict(entity.to_dict(exclude_id=True))
         return entity, self._post(client, create_dto, headers=self._get_auth_headers(auth_user_data))
 
-    def _from_factory(self, client: TestClient, auth_user_data: AuthResponseDTO, **kwargs) -> E:
-        return self.factory(**kwargs)
+    def _from_factory(self, client: TestClient, auth_user_data: AuthResponseDTO, **kwargs: dict) -> E:
+        return self.factory(**kwargs)  # type: ignore[return-value]
 
-    def test_create_multiple(self, client: TestClient, auth_user_data: AuthResponseDTO):
+    def test_create_multiple(self, client: TestClient, auth_user_data: AuthResponseDTO) -> None:
         ids = []
         for _ in range(10):
             entity, response = self._create_entity(client, auth_user_data)
@@ -59,7 +58,7 @@ class BaseAPICRUDTest(Generic[E], BaseClientTest):
             ids.append(response.json()["id"])
         assert len(set(ids)) == 10
 
-    def test_update_entities(self, client: TestClient, auth_user_data: AuthResponseDTO):
+    def test_update_entities(self, client: TestClient, auth_user_data: AuthResponseDTO) -> None:
         entity, response = self._create_entity(client, auth_user_data)
         assert response.status_code == 201
         initial_data = response.json()
@@ -79,7 +78,7 @@ class BaseAPICRUDTest(Generic[E], BaseClientTest):
                 continue
             assert data[k] == v
 
-    def test_delete_entity(self, client: TestClient, auth_user_data: AuthResponseDTO):
+    def test_delete_entity(self, client: TestClient, auth_user_data: AuthResponseDTO) -> None:
         entity, response = self._create_entity(client, auth_user_data=auth_user_data)
         entity_id = response.json()["id"]
 

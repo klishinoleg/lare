@@ -1,11 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar
-
-from domain.abstract import BaseEntity, E
+from domain.abstract import BaseEntity
 from domain.account.entities import AccountEntity
 
 
-class BaseAccessValidator(ABC):
+class BaseAccessValidator[E: BaseEntity](ABC):
     """
     Interface for checking whether a user has access to a given entity.
 
@@ -28,6 +26,3 @@ class BaseAccessValidator(ABC):
             bool: True if the user has access, False otherwise.
         """
         ...
-
-
-BAL = TypeVar('BAL', bound=BaseAccessValidator)

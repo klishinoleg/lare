@@ -33,3 +33,4 @@ starlette~=0.46.1
 
 python-jose[cryptography]~=3.4.0
 bcrypt~=4.3.0
+tortoise_imagefield~= 0.1.7

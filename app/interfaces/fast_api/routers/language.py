@@ -6,7 +6,7 @@ from application.language.dtos import (
     LanguageCreateDTO,
     LanguageUpdateDTO
 )
-from interfaces.fastapi.routers.abstract.crud import BaseCRUDApiViewSet
+from interfaces.fast_api.routers.abstract.crud import BaseCRUDApiViewSet
 
 router = APIRouter(prefix="/language", tags=["Languages"])
 

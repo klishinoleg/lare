@@ -12,13 +12,13 @@ from domain.auth_profile.enums import AuthProviderType
 
 class TestAuthTelegram:
     @pytest.fixture(scope="module")
-    def service(self):
+    def service(self) -> AuthViaProfileService:
         register_auth_providers()
         settings.secret_key = "test_secret_key"
         return AuthViaProfileService(RepositoryTypes.MOCK)
 
     @pytest.mark.asyncio
-    async def test_provider_data(self, service: AuthViaProfileService):
+    async def test_provider_data(self, service: AuthViaProfileService) -> None:
         fake_init_data = create_fake_telegram_provider_data()
         auth_init_data = TelegramAuthInitDataDTO(
             provider_type=AuthProviderType.TELEGRAM,
@@ -36,7 +36,7 @@ class TestAuthTelegram:
         assert profiles[0].language_code == fake_user.language_code
 
     @pytest.mark.asyncio
-    async def test_bad_provided_data(self, service: AuthViaProfileService):
+    async def test_bad_provided_data(self, service: AuthViaProfileService) -> None:
         fake_init_data = create_fake_telegram_provider_data()
         fake_init_data.init_data = fake_init_data.init_data.replace("hash=", "hash=a")
         auth_init_data = TelegramAuthInitDataDTO(

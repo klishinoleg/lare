@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Callable
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -87,7 +89,7 @@ async def get_current_account_or_none(
         return None
 
 
-def get_account_func(with_raise=False):
+def get_account_func(with_raise: bool = False) -> Callable:
     if with_raise:
         return get_current_account
     return get_current_account_or_none

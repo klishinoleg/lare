@@ -2,21 +2,21 @@ from __future__ import annotations
 from domain.abstract import EntityRepository
 from abc import ABC
 from typing import List
-from domain.abstract import E
+from domain.abstract import BaseEntity
 
 
-class Table:
-    def __init__(self):
+class Table[E: BaseEntity]:
+    def __init__(self) -> None:
         self.entities: dict[int, E] = {}
         self.counter: int = 1
         super().__init__()
 
-    def clear(self):
+    def clear(self) -> None:
         self.entities = {}
         self.counter = 1
 
 
-class BaseMockRepository(EntityRepository[E], ABC):
+class BaseMockRepository[E: BaseEntity](EntityRepository[E], ABC):
     """
     Base in-memory repository implementation for testing.
 
@@ -45,9 +45,9 @@ class BaseMockRepository(EntityRepository[E], ABC):
             Insert or update an entity. Assigns a new ID if needed.
     """
 
-    db = {}
+    db: dict[str, Table] = {}
 
-    def __init__(self):
+    def __init__(self) -> None:
         classname = self.__class__.__name__.lower()
         if classname not in self.db:
             self.db[classname] = Table()

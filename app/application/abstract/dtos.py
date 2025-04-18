@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import TypeVar, Self
+from typing import Self
 
 from pydantic import BaseModel
 
@@ -24,10 +24,3 @@ class BaseItemsListDTO(ABC, BaseModelWithSafeFields):
 
 class BaseItemDTO(ABC, BaseModelWithSafeFields):
     id: int
-
-
-BDTO = TypeVar("BDTO", bound=BaseModelWithSafeFields)
-BCIDTO = TypeVar('BCIDTO', bound=BaseCreateItemDTO)
-BUIDTO = TypeVar('BUIDTO', bound=BaseUpdateItemDTO)
-BILDTO = TypeVar('BILDTO', bound=BaseItemsListDTO)
-BIDTO = TypeVar('BIDTO', bound=BaseItemDTO)

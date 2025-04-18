@@ -1,12 +1,11 @@
 from __future__ import annotations
-from domain.abstract import EntityRepository
+from domain.abstract import EntityRepository, BaseEntity
 from abc import ABC, abstractmethod
-from typing import List, Generic, Type
-from .models.abstract import TM
-from domain.abstract import E
+from typing import List, Type
+from .models.abstract import AbstractModel
 
 
-class BaseTortoiseRepository(Generic[E, TM], EntityRepository[E], ABC):
+class BaseTortoiseRepository[E: BaseEntity, TM: AbstractModel](EntityRepository[E], ABC):
     """
     Abstract base repository for implementing domain entity persistence using Tortoise ORM.
 
@@ -111,9 +110,10 @@ class BaseTortoiseRepository(Generic[E, TM], EntityRepository[E], ABC):
         if entity.id is None:
             o = await self.model(**entity.to_dict(exclude_id=True))
         else:
-            o = await self.model.get_or_none(id=entity.id)
-            if not o:
+            record = await self.model.get_or_none(id=entity.id)
+            if record is None:
                 return None
+            o = record  # type: ignore[assignment]
             o.update_from_dict(entity.to_dict())
         await o.save()
         saved_entity = await self.to_entity(o)

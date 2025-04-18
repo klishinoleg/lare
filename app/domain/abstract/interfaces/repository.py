@@ -1,10 +1,9 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Optional, List
-from domain.abstract.entity import E
+from typing import Optional, List
 
 
-class EntityRepository(ABC, Generic[E]):
+class EntityRepository[BaseEntity](ABC):
     """
     Abstract base class for a repository that manages a specific domain entity.
 
@@ -29,7 +28,7 @@ class EntityRepository(ABC, Generic[E]):
     """
 
     @classmethod
-    def get_base_class_name(cls):
+    def get_base_class_name(cls) -> str:
         """
         Returns the simplified class name without the 'Repository' suffix.
 
@@ -41,7 +40,7 @@ class EntityRepository(ABC, Generic[E]):
         return cls.__name__.replace('Repository', '')
 
     @abstractmethod
-    async def get_by_id(self, id: int) -> Optional[E]:
+    async def get_by_id(self, id: int) -> Optional[BaseEntity]:
         """
         Retrieve an entity by its unique identifier.
 
@@ -54,7 +53,7 @@ class EntityRepository(ABC, Generic[E]):
         ...
 
     @abstractmethod
-    async def list(self) -> List[E]:
+    async def list(self) -> List[BaseEntity]:
         """
         List all entities.
 
@@ -64,7 +63,7 @@ class EntityRepository(ABC, Generic[E]):
         ...
 
     @abstractmethod
-    async def save(self, entity: E) -> E | None:
+    async def save(self, entity: BaseEntity) -> BaseEntity | None:
         """
         Create or update an entity.
 
@@ -88,7 +87,3 @@ class EntityRepository(ABC, Generic[E]):
             bool: True if deletion succeeded, False otherwise.
         """
         ...
-
-
-# Generic type for working with repositories in a type-safe way
-ER = TypeVar('ER', bound=EntityRepository)

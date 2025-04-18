@@ -2,22 +2,19 @@ from __future__ import annotations
 
 from factory import Factory
 import pytest
-from abc import ABC, abstractmethod
-from typing import Generic, Callable, Type, TypeVar
-from application.abstract.services.crud import BCRUDS
+from abc import ABC
+from typing import Type
+from application.abstract.services.crud import BaseCRUDService
 from application.access_control.services.user_creator_service import UserCreatorService
 from application.account.services import AccountService
 from core.enums.repository.types import RepositoryTypes
-from domain.abstract import ER, E, EntityNotFoundException, PermissionDenied
+from domain.abstract import BaseEntity, EntityRepository, EntityNotFoundException, PermissionDenied
 from domain.account.entities import AccountEntity
 from tests.t_domain.entities.account import AccountFactory
 
-# FactoryType defines a callable that returns a new entity instance
-FactoryType = TypeVar("FactoryType", bound=Factory)
-
 
 # Abstract base class for reusable CRUD service tests
-class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
+class BaseCRUDServiceTest[E: BaseEntity, ER: EntityRepository, BCRUDS: BaseCRUDService, F: Factory](ABC):
     # Repository type to use (e.g. MOCK, TORTOISE, REDIS, etc.)
     init_repository_type: RepositoryTypes = RepositoryTypes.MOCK
     # Abstract repository class (interface) to be resolved via DI
@@ -25,14 +22,14 @@ class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
     # Service class that implements CRUD logic
     init_service_type: Type[BCRUDS]
     # Factory method to generate test entities
-    factory: FactoryType
+    factory: Type[F]
     # Initialized service instance
     _service: BCRUDS
     _main_account: AccountEntity | None = None
     _field_for_update = "name"
 
     @pytest.fixture(autouse=True)
-    def setup_func(self):
+    def setup_func(self) -> None:
         """
         Automatically executed before each test.
         Initializes the service using the DIRepository and assigns the factory method.
@@ -44,7 +41,7 @@ class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
         self._factory = self.factory
 
     @pytest.mark.asyncio
-    async def test_create_one(self):
+    async def test_create_one(self) -> None:
         """
         Test that a single entity can be created and retrieved by its ID.
         """
@@ -55,7 +52,7 @@ class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
         assert fetched.id == created.id
 
     @pytest.mark.asyncio
-    async def test_create_multiple(self):
+    async def test_create_multiple(self) -> None:
         """
         Test that multiple entities can be created and have unique IDs.
         """
@@ -66,7 +63,7 @@ class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
         assert all(ids)
 
     @pytest.mark.asyncio
-    async def test_update_entities(self):
+    async def test_update_entities(self) -> None:
         """
         Test updating existing entities and ensuring that ID cannot be changed.
         """
@@ -87,7 +84,7 @@ class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
             assert result is False or fetched.id != 999999
 
     @pytest.mark.asyncio
-    async def test_list_entities(self):
+    async def test_list_entities(self) -> None:
         """
         Test that the service returns all created entities and all have unique IDs.
         """
@@ -99,7 +96,7 @@ class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
         assert all(ids)
 
     @pytest.mark.asyncio
-    async def test_delete_entity(self):
+    async def test_delete_entity(self) -> None:
         """
         Test deleting an entity, and ensure:
         - the entity is removed
@@ -123,7 +120,7 @@ class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
         assert alive_fetched.id == alive_entity.id
 
     @pytest.mark.asyncio
-    async def test_superuser(self):
+    async def test_superuser(self) -> None:
         superuser = await UserCreatorService.create_superuser(username="superuser", password="passw",
                                                               public_name="Super User",
                                                               repository_type=self.init_repository_type)
@@ -137,7 +134,7 @@ class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
             await self._service.get_by_id(entity.id)
 
     @pytest.mark.asyncio
-    async def test_delete_entity_with_wrong_account(self):
+    async def test_delete_entity_with_wrong_account(self) -> None:
         entity = await self._service.create(await self._get_fake_entity())
         wrong_account = await self._get_account_service().create(AccountFactory())
         with pytest.raises(PermissionDenied):
@@ -155,10 +152,10 @@ class BaseCRUDServiceTest(ABC, Generic[E, BCRUDS]):
             return entity
         return await self._get_main_account()
 
-    async def _get_fake_entity(self, **kwargs) -> E:
-        return self.factory(**kwargs)
+    async def _get_fake_entity(self, **kwargs: dict) -> E:
+        return self.factory(**kwargs)  # type: ignore[return-value]
 
-    def _get_account_service(self):
+    def _get_account_service(self) -> AccountService:
         if isinstance(self._service, AccountService):
             return self._service
         if not getattr(self, "_account_service", None):

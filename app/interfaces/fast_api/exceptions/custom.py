@@ -5,7 +5,7 @@ from starlette.responses import JSONResponse
 from domain.abstract import DomainValidationException, EntityNotFoundException
 
 
-def register_exception_handler(app: FastAPI):
+def register_exception_handler(app: FastAPI) -> None:
     """
     Register global exception handlers for domain-level exceptions in the FastAPI application.
 
@@ -21,7 +21,7 @@ def register_exception_handler(app: FastAPI):
     """
 
     @app.exception_handler(DomainValidationException)
-    async def exception_handler(request: Request, exc: DomainValidationException):
+    async def exception_handler(request: Request, exc: DomainValidationException) -> JSONResponse:
         """
         Handle domain validation exceptions (422).
 
@@ -40,7 +40,7 @@ def register_exception_handler(app: FastAPI):
         )
 
     @app.exception_handler(EntityNotFoundException)
-    async def not_fount_handler(request: Request, exc: EntityNotFoundException):
+    async def not_fount_handler(request: Request, exc: EntityNotFoundException) -> JSONResponse:
         """
         Handle entity not found exceptions (404).
 

@@ -1,10 +1,11 @@
 import asyncio
 import copy
+from typing import Callable
 
-from domain.abstract import E
+from domain.abstract import BaseEntity
 
 
-class MethodWorkerMixin:
+class MethodWorkerMixin[E: BaseEntity]:
     """
     Mixin class to dynamically discover and invoke methods by prefix.
 
@@ -33,7 +34,7 @@ class MethodWorkerMixin:
             Each method receives and must return an updated entity.
     """
 
-    def _get_methods_by_start_with(self, start_with: str):
+    def _get_methods_by_start_with(self, start_with: str) -> dict[str, Callable]:
         """
         Get all methods that start with a given prefix, cached per prefix.
 
@@ -44,7 +45,7 @@ class MethodWorkerMixin:
             dict[str, Callable]: Mapping of method names to method objects.
         """
         if not hasattr(self, '__start_with_methods_cache'):
-            self.__start_with_methods_cache = {}
+            self.__start_with_methods_cache: dict = {}
         if self.__start_with_methods_cache.get(start_with) is None:
             self.__start_with_methods_cache[start_with] = set(
                 attr_name
@@ -53,7 +54,7 @@ class MethodWorkerMixin:
             )
         return {k: getattr(self, k) for k in self.__start_with_methods_cache[start_with]}
 
-    async def _run_methods(self, start_with: str, *args):
+    async def _run_methods(self, start_with: str, *args: tuple) -> None:
         """
         Run all methods starting with the given prefix and pass *args to them.
 

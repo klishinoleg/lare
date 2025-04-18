@@ -6,8 +6,8 @@ from abc import ABC
 class WithActiveMixin(ABC):
     is_active: bool = field(repr=False, default_factory=lambda: True)
 
-    def activate(self):
+    def activate(self) -> None:
         self.is_active = True
 
-    def deactivate(self):
+    def deactivate(self) -> None:
         self.is_active = False

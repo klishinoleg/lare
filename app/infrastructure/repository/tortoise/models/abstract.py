@@ -1,4 +1,3 @@
-from typing import TypeVar
 from tortoise import models
 
 
@@ -19,7 +18,3 @@ class AbstractModel(models.Model):
 
     class Meta:
         abstract = True
-
-
-# Generic type used for referencing Tortoise models in a type-safe way
-TM = TypeVar('TM', bound=AbstractModel)
