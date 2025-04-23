@@ -1,7 +1,5 @@
 from __future__ import annotations
-
 from random import shuffle
-
 import pytest
 from application.book.services.book_crud_service import BookService
 from application.language.service import LanguageService

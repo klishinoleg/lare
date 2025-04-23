@@ -43,7 +43,7 @@ class BaseCRUDService[E: BaseEntity, AR: EntityRepository, BIDTO: BaseItemDTO, B
     # Repository configuration
     entity_repository_type: Type[AR] | None = None
     repository: AR | None = None
-    repository_type: RepositoryTypes = RepositoryTypes.TORTOISE
+    repository_type: RepositoryTypes | None = RepositoryTypes.TORTOISE
 
     # Entity and DTO types
     entity_class: Type[E]
@@ -57,7 +57,7 @@ class BaseCRUDService[E: BaseEntity, AR: EntityRepository, BIDTO: BaseItemDTO, B
 
     def __init__(
             self,
-            repository_type: RepositoryTypes = RepositoryTypes.TORTOISE,
+            repository_type: RepositoryTypes | None = None,
             entity_repository_type: Optional[Type[EntityRepository[E]]] = None
     ) -> None:
         """
@@ -175,7 +175,7 @@ class BaseCRUDService[E: BaseEntity, AR: EntityRepository, BIDTO: BaseItemDTO, B
             raise RepositoryIsNotSet()
         return await self.repository.list()
 
-    async def update(self, entity: E, account: AccountEntity) -> E:
+    async def update(self, entity: E, account: AccountEntity | None = None, is_system: bool = False) -> E:
         """
         Validate and update an existing entity.
 
@@ -183,8 +183,9 @@ class BaseCRUDService[E: BaseEntity, AR: EntityRepository, BIDTO: BaseItemDTO, B
         """
         if not self.repository:
             raise RepositoryIsNotSet()
-        await Accessor.or_raise(entity, account, self.access_role, self.repository_type)
-        await self._run_methods("_update_validate__", entity)
+        if not is_system:
+            await Accessor.or_raise(entity, account, self.access_role, self.repository_type)
+            await self._run_methods("_update_validate__", entity)
         new_entity = await self._modificate_entity("_update_modificate__", entity)
         saved_entity = await self.repository.save(new_entity)
         if not saved_entity:

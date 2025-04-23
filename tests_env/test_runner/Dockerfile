@@ -8,6 +8,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY ./tests ./tests
 COPY ./app ./app
-COPY ../tests_env/test_runner/run_tests.sh ./run_tests.sh
+COPY ./tests_env/.env ./app/
+COPY ./tests_env/test_runner/run_tests.sh ./
 
 RUN chmod +x run_tests.sh

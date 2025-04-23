@@ -11,6 +11,7 @@ from core.enums.repository.types import RepositoryTypes
 from domain.abstract import BaseEntity, EntityRepository, EntityNotFoundException, PermissionDenied
 from domain.account.entities import AccountEntity
 from tests.t_domain.entities.account import AccountFactory
+from core.config import settings
 
 
 # Abstract base class for reusable CRUD service tests
@@ -27,6 +28,10 @@ class BaseCRUDServiceTest[E: BaseEntity, ER: EntityRepository, BCRUDS: BaseCRUDS
     _service: BCRUDS
     _main_account: AccountEntity | None = None
     _field_for_update = "name"
+
+    def __init_subclass__(cls, **kwargs: dict) -> None:
+        settings.repository_type = cls.init_repository_type
+        super().__init_subclass__(**kwargs)
 
     @pytest.fixture(autouse=True)
     def setup_func(self) -> None:

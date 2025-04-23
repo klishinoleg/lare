@@ -1,6 +1,12 @@
 from __future__ import annotations
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from aiofiles import os
+from core.enums.dev.enviroment_types import EnviromentTypes
+from core.enums.events.broker_types import EventBrokerTypes
+from core.enums.logger.logger_types import LoggersTypes
+from core.enums.repository.types import RepositoryTypes
+from core.enums.storage.deduplicator import DeduplicatorTypes
 
 
 class Settings(BaseSettings):
@@ -23,12 +29,24 @@ class Settings(BaseSettings):
     tg_bot_token: str = ""
     web_app_url: str = ""
     database_url: str = ""
+    redis_url: str = ""
     secret_key: str = ""
     images_upload_dir: str = ""
     images_upload_url: str = ""
     kafka_broker_url: str = ""
+    kafka_bootstrap_servers: str = ""
     event_data_dir: str = ""
-
+    celery_app_name: str = "lare"
+    celery_broker_url: str = ""
+    celery_backend_url: str = ""
+    sentry_redis_url: str = ""
+    sentry_secret_key: str = ""
+    sentry_dsn: str = ""
+    enviroment: EnviromentTypes = EnviromentTypes.PRODUCTION
+    loggers_type: LoggersTypes = LoggersTypes.SENTRY
+    event_broker_type: EventBrokerTypes = EventBrokerTypes.KAFKA
+    deduplicator_type: DeduplicatorTypes = DeduplicatorTypes.REDIS
+    repository_type: RepositoryTypes = RepositoryTypes.TORTOISE
     model_config = SettingsConfigDict(env_file=Path(__file__).parent.parent / ".env", extra='ignore')
 
     def get_upload_dir(self) -> Path:
@@ -36,9 +54,10 @@ class Settings(BaseSettings):
         path.mkdir(exist_ok=True)
         return path
 
-    def get_event_data_dir(self, subdir: str, file_name: str) -> Path:
+    async def get_event_data_dir(self, subdir: str, file_name: str) -> Path:
         dir_path = Path(__file__).parent.parent / self.event_data_dir / subdir
-        dir_path.mkdir(exist_ok=True)
+        if not await os.path.exists(dir_path):
+            await os.makedirs(dir_path, exist_ok=True)
         return dir_path / file_name
 
 

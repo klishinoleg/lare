@@ -1,0 +1,5 @@
+from .words_saved import ChapterWordsSavedEventHandler
+from .creation_error import ChapterCreationErrorEventHandler
+from .creation_complited import ChapterCreationComplitedEventHandler
+from .create_requested import ChapterCreateRequestedEventHandler
+from .text_processed import ChapterTextProcessedEventHandler

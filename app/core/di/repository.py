@@ -1,7 +1,9 @@
 from __future__ import annotations
+
+from enum import Enum
 from importlib import import_module
 from typing import Type, cast
-
+from core.config import settings
 from core.helpers.funcs.strings import camel_to_snake
 from domain.abstract import EntityRepository
 from core.enums.repository.types import RepositoryTypes
@@ -13,7 +15,7 @@ class DIRepository[ER: EntityRepository]:
     @classmethod
     def get_repository(cls,
                        entity_repository: Type[ER],
-                       repository_type: RepositoryTypes = RepositoryTypes.TORTOISE) -> Type[ER]:
+                       repository_type: RepositoryTypes | None | str = None) -> Type[ER]:
         """
         Dynamic Repository Resolver
         ---------------------------
@@ -55,8 +57,10 @@ class DIRepository[ER: EntityRepository]:
         This avoids silent misconfiguration and ensures reliable resolution.
 
         """
+        if not repository_type:
+            repository_type = settings.repository_type
         base_repository_name = entity_repository.get_base_class_name()
-        type_str = repository_type.value
+        type_str: str = repository_type.value if isinstance(repository_type, Enum) else repository_type
         if type_str not in cls.repositories:
             cls.repositories[type_str] = {}
         if base_repository_name not in cls.repositories[type_str]:

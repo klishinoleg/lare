@@ -11,7 +11,7 @@ class TortoiseChapterRepository(BaseTortoiseRepository[ChapterModel, ChapterEnti
     """
     model = ChapterModel
 
-    def to_entity(self, model: ChapterModel) -> ChapterEntity:
+    async def to_entity(self, model: ChapterModel) -> ChapterEntity:
         return ChapterEntity(
             id=model.id,
             name=model.name,
@@ -24,4 +24,4 @@ class TortoiseChapterRepository(BaseTortoiseRepository[ChapterModel, ChapterEnti
 
     async def get_by_book(self, book_id: int, account_id: int) -> list[ChapterEntity]:
         models = await ChapterModel.filter(book_id=book_id, book__account_id=account_id).all()
-        return [self.to_entity(model) for model in models]
+        return [await self.to_entity(model) for model in models]

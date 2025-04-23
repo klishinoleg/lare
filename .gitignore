@@ -34,3 +34,4 @@ pytest_cache/
 /help/
 /node_modules/
 /docker_develop/.env
+/app/uploads/

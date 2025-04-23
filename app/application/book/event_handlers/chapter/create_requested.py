@@ -1,25 +1,40 @@
-from application.events.event_router import register_event_handler
-from application.book.services.text_processing import process_text_to_chapters
-from application.book.events.chapter_events import ChapterCreateRequestedEvent, ChapterTextProcessedEvent
-from application.events.event_types import EventTypes
-from core.config import settings
-from core.di.data_storage import DIDataStorage
+import traceback
+from application.abstract.events import BaseEventHandler
+from application.book.services.chapter_crud_service import ChapterService
+from application.book.utils.text_processing import process_text_to_chapters
+from application.book.events.chapter_events import ChapterCreateRequestedEvent, ChapterTextProcessedEvent, \
+    ChapterCreationErrorEvent
 from core.di.events import DIPublisher
 from dataclass_toolkit import serialize_dataclass_to_list
+from domain.abstract import DomainException
 
 
-@register_event_handler(EventTypes.CHAPTER_CREATE_REQUESTED, ChapterCreateRequestedEvent)
-async def handle_chapter_create_requested(event: ChapterCreateRequestedEvent) -> None:
-    """
-    Handle the creation of a chapter after receiving the requested event.
-    """
-    chapters = await process_text_to_chapters(event.text)
-    save_path = settings.get_event_data_dir("chapters", f"{event.book_id}_{event.name}.json")
-    await DIDataStorage[list].get().save_json(save_path, [serialize_dataclass_to_list(chapter) for chapter in chapters])
-    await DIPublisher[ChapterCreateRequestedEvent].publish(
-        event_type=EventTypes.CHAPTER_TEXT_PROCESSED,
-        payload=ChapterTextProcessedEvent(
-            chapter_id=event.book_id,
-            words_json_path=save_path,
-        ),
-    )
+class ChapterCreateRequestedEventHandler[BE: ChapterCreateRequestedEvent](BaseEventHandler[BE]):
+    event_type = ChapterCreateRequestedEvent.event_type
+
+    @classmethod
+    async def handler(cls, event: ChapterCreateRequestedEvent, group_id: int | None) -> None:
+        """
+        Handle the creation of a chapter after receiving the requested event.
+        """
+        try:
+            chaper_sevice = ChapterService()
+            created_chapter = await chaper_sevice.get_by_id(id=event.chapter_id)
+            words = await process_text_to_chapters(event.text)
+            await DIPublisher[ChapterCreateRequestedEvent].publish(
+                payload=ChapterTextProcessedEvent(
+                    chapter_id=created_chapter.id,
+                    words_data=[serialize_dataclass_to_list(word) for word in words],
+                ),
+                group_id=f"book:{event.book_id}",
+            )
+        except DomainException as ex:
+            await DIPublisher[ChapterCreationErrorEvent].publish(
+                payload=ChapterCreationErrorEvent(
+                    error_message=str(ex),
+                    traceback=traceback.format_exc(),
+                    step=event.event_type,
+                    book_id=event.book_id,
+                    chapter_id=event.chapter_id,
+                )
+            )
