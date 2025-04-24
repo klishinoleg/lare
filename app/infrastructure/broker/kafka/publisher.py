@@ -13,7 +13,7 @@ class KafkaPublisher(BasePublisher):
         Publishes an event to Kafka.
 
         Args:
-            event_type (EventTypes): The type of event (topic name).
+            event_type (ChapterEventTypes): The type of event (topic name).
             payload (dict): The event data (serialized).
             :param payload:
             :param group_id:

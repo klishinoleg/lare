@@ -57,3 +57,7 @@ class GetExMessages[E: BaseEntity]:
     @staticmethod
     def wrong_repeat_password() -> str:
         return "Wrong repeat password"
+
+    @staticmethod
+    def for_make_payment_you_have_to_create_auth_profile(auth_provider_type: AuthProviderType) -> str:
+        return "For make payment you have to create auth profile: {}".format(auth_provider_type.value)

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from application.events.event_types import EventTypes
+from application.events.event_types import ChapterEventTypes
 from abc import ABC, abstractmethod
 from typing import ClassVar, Any
 from uuid import UUID, uuid4
@@ -10,11 +10,17 @@ from core.di.deduplicator import DIDeduplicator
 
 class BaseEvent(BaseModel):
     id: UUID = Field(default_factory=uuid4)
-    event_type: ClassVar[EventTypes]
+    event_type: ClassVar[ChapterEventTypes]
+
+
+class BaseErrorEvent(BaseEvent):
+    step: ChapterEventTypes
+    error_message: str
+    traceback: str | None = None
 
 
 class BaseEventHandler[BE: BaseEvent](ABC):
-    event_type: EventTypes
+    event_type: ChapterEventTypes
     event_handler_group: HandlerGroups = HandlerGroups.MAIN
 
     @classmethod

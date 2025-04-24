@@ -1,4 +1,3 @@
-import traceback
 from application.abstract.events import BaseEventHandler
 from application.book.datatypes.chapter_content import ChapterContentWordType
 from application.book.services.book_crud_service import BookService
@@ -7,12 +6,14 @@ from application.book.services.word_chapter_saver import WordChapterSaverService
 from application.book.events.chapter_events import ChapterTextProcessedEvent, ChapterWordsSavedEvent, \
     ChapterCreationErrorEvent
 from dataclass_toolkit import deserialize_list_to_dataclass
+
+from application.events.handler_groups import HandlerGroups
 from core.di.events import DIPublisher
-from domain.abstract import DomainException
 
 
 class ChapterTextProcessedEventHandler(BaseEventHandler[ChapterTextProcessedEvent]):
     event_type = ChapterTextProcessedEvent.event_type
+    event_handler_group: HandlerGroups = HandlerGroups.CHAPTER
 
     @classmethod
     async def handler(cls, event: ChapterTextProcessedEvent, group_id: int | None) -> None:
@@ -39,13 +40,12 @@ class ChapterTextProcessedEventHandler(BaseEventHandler[ChapterTextProcessedEven
                 ),
                 group_id=f"book:{book.id}",
             )
-        except DomainException as ex:
-            await DIPublisher[ChapterCreationErrorEvent].publish(
-                payload=ChapterCreationErrorEvent(
-                    error_message=str(ex),
-                    traceback=traceback.format_exc(),
-                    step=event.event_type,
-                    book_id=book_id,
-                    chapter_id=event.chapter_id,
-                )
+        except Exception as ex:
+            await DIPublisher[ChapterCreationErrorEvent].publish_error(
+                event_error_model=ChapterCreationErrorEvent,
+                ex=ex,
+                step=event.event_type,
+                group_id=f"book:{book_id}",
+                book_id=book_id,
+                chapter_id=event.chapter_id,
             )

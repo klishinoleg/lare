@@ -27,6 +27,7 @@ class Settings(BaseSettings):
 
     default_language: str = "en"
     tg_bot_token: str = ""
+    tg_payment_provider_token: str = ""
     web_app_url: str = ""
     database_url: str = ""
     redis_url: str = ""

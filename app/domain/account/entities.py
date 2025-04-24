@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-
+from decimal import Decimal
 from domain.abstract import BaseEntity
 from domain.mixins.timestamp_mixin import TimestampMixin
 from domain.mixins.with_active_mixin import WithActiveMixin
@@ -35,14 +35,14 @@ class AccountEntity(BaseEntity, WithActiveMixin, TimestampMixin):
     username: str
     public_name: str | None
     email: str | None = field(repr=False)
-    credits: float = field(repr=False, default=0.0)
+    credits: Decimal = field(repr=False, default_factory=Decimal)
 
-    def has_enough_credits(self, amount: float | None = None) -> bool:
+    def has_enough_credits(self, amount: Decimal | None = None) -> bool:
         """
         Check if the user has enough credits.
 
         Args:
-            amount (float | None): Optional amount to check against.
+            amount (Decimal | None): Optional amount to check against.
 
         Returns:
             bool: True if credits are sufficient, False otherwise.

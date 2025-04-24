@@ -49,3 +49,4 @@ asgi_lifespan~=2.1.0
 celery~=5.5.1
 sentry_sdk~=2.26.1
 faststream[cli]
+aiogram~=3.20.0
