@@ -1,13 +1,3 @@
-from locust import HttpUser, task, between
-from tests.load_tests.test_account_load_api import TestAccountLoadAPI
+from tests.load_tests.locust_tasks import LazyReaderTestUser
 
-account_loader = TestAccountLoadAPI()
-
-
-class AccountUser(HttpUser):
-    wait_time = between(0.1, 0.3)
-
-    @task
-    def create_account(self) -> None:
-
-        self.client.post(account_loader.route + "/", json=account_loader.get_create_payload())
+print(f"Loaded tests: {LazyReaderTestUser.__name__}")

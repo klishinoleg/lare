@@ -7,12 +7,16 @@ from .abstract import AbstractModel
 
 if TYPE_CHECKING:
     from .book import BookModel
+    from .account import AccountModel
 
 
 class ChapterModel(AbstractModel):
     """
     ORM model representing a chapter entry in the database.
     """
+    if TYPE_CHECKING:
+        book_id: int
+        account_id: int
 
     id = fields.IntField(primary_key=True)
     name = fields.CharField(max_length=255)
@@ -20,6 +24,11 @@ class ChapterModel(AbstractModel):
         "models.BookModel",
         related_name="chapters",
         on_delete=fields.CASCADE,
+    )
+    account: fields.ForeignKeyRelation["AccountModel"] = fields.ForeignKeyField(
+        "models.AccountModel",
+        related_name="chapters",
+        on_delete=fields.CASCADE
     )
     source_url = fields.CharField(max_length=500)
     position = fields.IntField(default=0)

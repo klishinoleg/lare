@@ -32,7 +32,7 @@ class BookListDTO(BaseItemsListDTO):
     """
     id: int = Field(..., description="Unique identifier of the book.")
     name: str = Field(..., description="The title of the book.")
-    image: str = Field(..., description="Image url")
+    image: str | None = Field(default=None, description="Image url")
     chapters_cnt: int = Field(..., description="The number of chapters of the book.")
 
 

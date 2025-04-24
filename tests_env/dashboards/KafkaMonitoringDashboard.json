@@ -1,0 +1,86 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "kafka-monitoring",
+    "title": "Kafka Monitoring",
+    "tags": ["kafka"],
+    "timezone": "browser",
+    "schemaVersion": 36,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "Total Kafka Lag",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(kafka_consumergroup_lag)",
+            "legendFormat": "Total Lag",
+            "interval": ""
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Lag per Partition",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "kafka_consumergroup_lag",
+            "legendFormat": "{{topic}} partition {{partition}}",
+            "interval": ""
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Messages In per Topic",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(kafka_topic_partition_current_offset[1m])",
+            "legendFormat": "{{topic}}",
+            "interval": ""
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 16
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Consumer Group Offsets",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "kafka_consumergroup_current_offset",
+            "legendFormat": "{{topic}}/{{group}}",
+            "interval": ""
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 24
+        }
+      }
+    ]
+  }
+}

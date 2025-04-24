@@ -4,14 +4,118 @@ services:
     image: postgres:latest
     container_name: lare_test_db
     restart: always
-    environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
-      POSTGRES_DB: test_db
-    expose:
-      - "5432"
+    env_file:
+      - .env
+    ports:
+      - "5435:5432"
     volumes:
       - test_pg_data:/var/lib/postgresql/data
+    networks:
+      - database
+
+  init_sentry_db:
+    image: postgres:latest
+    container_name: lare_test_init_sentry_db
+    entrypoint: ["/bin/bash", "-c", "/scripts/init_sentry_db.sh"]
+    volumes:
+      - ./db:/scripts
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - database
+
+  redis:
+    image: redis:latest
+    container_name: lare_test_redis
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - redis
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: lare_test_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - kafka
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: lare_test_kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,DOCKER://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,DOCKER://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - kafka
+
+  kafka-topic-init:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - kafka
+    entrypoint: ["/bin/bash", "-c", "/create-topics.sh"]
+    volumes:
+      - ./kafka/create-topics.sh:/create-topics.sh
+    networks:
+      - kafka
+
+  kafka-topic-change:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - kafka
+    entrypoint: ["/bin/bash", "-c", "/change-topics.sh"]
+    volumes:
+      - ./kafka/change-topics.sh:/change-topics.sh
+    networks:
+      - kafka
+
+  kafka_worker:
+    build:
+      context: ..
+      dockerfile: tests_env/app_workers/Dockerfile
+    command: ["faststream", "run", "interfaces.event_broker.kafka_chapter:app"]
+    restart: unless-stopped
+    depends_on:
+      - kafka-topic-init
+      - db
+      - redis
+      - kafka_exporter
+      - kafka_ui
+    env_file:
+      - .env
+    networks:
+      - kafka
+      - database
+      - redis
+
+  kafka_ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: lare_test_kafka_ui
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    networks:
+      - kafka
 
   app:
     build:
@@ -19,11 +123,19 @@ services:
       dockerfile: tests_env/app/Dockerfile
     container_name: lare_test_app
     depends_on:
-      - db
+      - init_sentry_db
+      - kafka
     environment:
       DATABASE_URL: postgres://test:test@db:5432/test_db
-    expose:
-      - "8000"
+    ports:
+      - "8088:8000"
+    networks:
+      - database
+      - redis
+      - kafka
+      - celery
+      - front
+      - back
 
   test_runner:
     build:
@@ -32,11 +144,20 @@ services:
     container_name: lare_test_runner
     depends_on:
       - app
+      - kafka_worker
     environment:
       BASE_URL: http://app:8000
     command: ["sh", "./run_tests.sh"]
+    networks:
+      - database
+      - redis
+      - kafka
 
   locust:
+    container_name: lare_test_locust
+    depends_on:
+      - app
+      - kafka_worker
     build:
       context: ..
       dockerfile: tests_env/locust/Dockerfile
@@ -46,6 +167,122 @@ services:
     ports:
       - "8089:8089"
     volumes: []
+    networks:
+      - front
+
+  kafka_exporter:
+    image: danielqsj/kafka-exporter
+    container_name: lare_test_kafka_exporter
+    depends_on:
+      - kafka
+    ports:
+      - "9308:9308"
+    environment:
+      KAFKA_URI: kafka:29092
+      KAFKA_SERVER: kafka:29092
+    networks:
+      - kafka
+
+  celery_exporter:
+    build:
+      context: .
+      dockerfile: celery_exporter/Dockerfile
+    container_name: lare_test_celery_exporter
+    ports:
+      - "9812:9812"
+    depends_on:
+      - redis
+      - app
+    networks:
+      - celery
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: lare_test_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - kafka_exporter
+      - celery_exporter
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - kafka
+      - celery
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: lare_test_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - kafka
+      - celery
+
+  flower:
+    image: mher/flower
+    container_name: lare_test_flower
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    networks:
+      - celery
+      - redis
+
+  sentry:
+    image: getsentry/sentry:latest
+    container_name: lare_test_sentry
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    environment:
+      SENTRY_SECRET_KEY: ${SENTRY_SECRET_KEY}
+      SENTRY_SINGLE_ORGANIZATION: "true"
+      SENTRY_DB_USER: ${POSTGRES_USER}
+      SENTRY_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SENTRY_DB_HOST: ${POSTGRES_HOST}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${SENTRY_DB_NAME}
+      SENTRY_REDIS_HOST: redis
+    depends_on:
+      - init_sentry_db
+      - redis
+    networks:
+      - database
+      - redis
+      - back
+
+  celery_worker:
+    build:
+      context: ..
+      dockerfile: tests_env/app_workers/Dockerfile
+    container_name: lare_test_celery_worker
+    command: ["python", "-m", "interfaces.event_broker.celery_chapter"]
+    depends_on:
+      - redis
+      - db
+      - flower
+    env_file:
+      - .env
+    networks:
+      - celery
+      - database
+      - redis
 
 volumes:
   test_pg_data:
+
+networks:
+  kafka:
+  database:
+  celery:
+  redis:
+  front:
+  back:

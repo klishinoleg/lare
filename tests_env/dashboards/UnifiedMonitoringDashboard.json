@@ -1,0 +1,167 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "unified-monitoring",
+    "title": "Unified Monitoring - Kafka & Celery",
+    "tags": ["kafka", "celery"],
+    "timezone": "browser",
+    "schemaVersion": 36,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "type": "stat",
+        "title": "Active Workers (Celery)",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(celery_worker_up)",
+            "legendFormat": "Workers"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "type": "stat",
+        "title": "Total Kafka Lag",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(kafka_consumergroup_lag)",
+            "legendFormat": "Total Lag"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Celery Tasks Started",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(celery_task_started_total[1m])",
+            "legendFormat": "Started"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 0,
+          "y": 4
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Celery Tasks Succeeded",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(celery_task_succeeded_total[1m])",
+            "legendFormat": "Succeeded"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 12,
+          "y": 4
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Celery Tasks Failed",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(celery_task_failed_total[1m])",
+            "legendFormat": "Failed"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 0,
+          "y": 10
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Average Task Runtime (Celery)",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "avg(celery_task_runtime_seconds)",
+            "legendFormat": "Avg Runtime"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 12,
+          "y": 10
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Kafka Lag per Partition",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "kafka_consumergroup_lag",
+            "legendFormat": "{{topic}} partition {{partition}}"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 24,
+          "x": 0,
+          "y": 16
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Kafka Messages In per Topic",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(kafka_topic_partition_current_offset[1m])",
+            "legendFormat": "{{topic}}"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 24,
+          "x": 0,
+          "y": 22
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Kafka Consumer Group Offsets",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "kafka_consumergroup_current_offset",
+            "legendFormat": "{{topic}}/{{group}}"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 24,
+          "x": 0,
+          "y": 28
+        }
+      }
+    ]
+  }
+}

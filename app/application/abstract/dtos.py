@@ -24,3 +24,13 @@ class BaseItemsListDTO(ABC, BaseModelWithSafeFields):
 
 class BaseItemDTO(ABC, BaseModelWithSafeFields):
     id: int
+
+
+class BaseActionResultDTO(ABC, BaseModel):
+    success: bool
+    message: str
+
+
+class BaseInCheckProgressDTO(ABC, BaseModel):
+    progress: int
+    step: str | None = None

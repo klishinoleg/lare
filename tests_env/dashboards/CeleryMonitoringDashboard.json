@@ -1,0 +1,104 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "celery-monitoring",
+    "title": "Celery Monitoring",
+    "tags": ["celery"],
+    "timezone": "browser",
+    "schemaVersion": 36,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "type": "stat",
+        "title": "Active Workers",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(celery_worker_up)",
+            "legendFormat": "Workers",
+            "interval": ""
+          }
+        ],
+        "gridPos": {
+          "h": 5,
+          "w": 5,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Tasks Started",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(celery_task_started_total[1m])",
+            "legendFormat": "Started",
+            "interval": ""
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 5
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Tasks Succeeded",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(celery_task_succeeded_total[1m])",
+            "legendFormat": "Succeeded",
+            "interval": ""
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 13
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Tasks Failed",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(celery_task_failed_total[1m])",
+            "legendFormat": "Failed",
+            "interval": ""
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 13
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Average Task Runtime",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "avg(celery_task_runtime_seconds)",
+            "legendFormat": "Avg Runtime (s)",
+            "interval": ""
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 21
+        }
+      }
+    ]
+  }
+}

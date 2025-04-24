@@ -5,7 +5,7 @@ from pathlib import Path
 from domain.language.entities import LanguageEntity
 
 
-def load_languages_init_entities(limit: int | None = None) -> list[LanguageEntity]:
+def load_languages_init_entities(limit: int | None = None, without_id: bool = False) -> list[LanguageEntity]:
     """
     Load languages from a CSV file and return as list of LanguageEntity.
     CSV must have headers: name,slug,code,original_name,ordering
@@ -26,7 +26,7 @@ def load_languages_init_entities(limit: int | None = None) -> list[LanguageEntit
             if limit and n > limit:
                 break
             entities.append(LanguageEntity(
-                id=int(str(row["id"])),
+                id=None if without_id else int(str(row["id"])),
                 name=row["name"],
                 ordering=int(row.get("ordering") or "100"),
                 original_name=row["original_name"],

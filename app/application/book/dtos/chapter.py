@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from pydantic import Field
-from application.abstract.dtos import BaseCreateItemDTO, BaseUpdateItemDTO, BaseItemDTO, BaseItemsListDTO
+from application.abstract.dtos import BaseCreateItemDTO, BaseUpdateItemDTO, BaseItemDTO, BaseItemsListDTO, \
+    BaseActionResultDTO
 
 
 class CreateChapterDTO(BaseCreateItemDTO):
@@ -10,8 +11,17 @@ class CreateChapterDTO(BaseCreateItemDTO):
     """
     name: str = Field(..., description="Title of the chapter.")
     book_id: int = Field(..., description="ID of the book to which this chapter belongs.")
-    account_id: int = Field(..., description="ID of the user who created the chapter.")
-    source_url: str = Field(..., description="URL or source reference from which the chapter originates.")
+    account_id: int | None = Field(default=None, description="ID of the user who created the chapter.")
+    source_url: str | None = Field(default=None,
+                                   description="URL or source reference from which the chapter originates.")
+
+
+class CreateChapterWithTextDTO(CreateChapterDTO):
+    text: str = Field(..., description="Chapter text.")
+
+
+class CreateChapterResultDTO(BaseActionResultDTO):
+    chapter_id: int
 
 
 class ChapterDTO(BaseItemDTO):
@@ -34,6 +44,7 @@ class ChapterListDTO(BaseItemsListDTO):
     id: int = Field(..., description="Unique identifier of the chapter.")
     name: str = Field(..., description="Title of the chapter.")
     position: int = Field(..., description="Position of the chapter within the book.")
+    is_ready: bool = Field(..., description="Flag indicating whether the chapter has been processed.")
 
 
 class UpdateChapterDTO(BaseUpdateItemDTO):

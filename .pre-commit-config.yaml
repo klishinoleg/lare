@@ -27,10 +27,10 @@ repos:
         args: ["--ignore-missing-imports"]
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.11.5
+    rev: v0.11.6
     hooks:
       - id: ruff
-        args: ["--fix", "--exclude=__init__.py"]
+        args: ["--exclude=__init__.py"]
 
   - repo: https://github.com/asottile/yesqa
     rev: v1.5.0

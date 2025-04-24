@@ -67,12 +67,13 @@ class EntityCRUDService[E: BaseEntity](ABC):
         ...
 
     @abstractmethod
-    async def update(self, entity: E, account: E) -> E:
+    async def update(self, entity: E, account: E | None = None, is_system: bool = False) -> E:
         """
         Update an existing entity.
 
         Args:
             entity (E): The entity with updated values.
+            :param is_system:
             :param entity:
             :param account:
         Returns:
