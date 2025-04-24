@@ -4,6 +4,7 @@ from domain.language.exceptions import LanguageException, LanguagePermissionDeni
 from application.abstract.services.crud import BaseCRUDService
 from application.language.dtos import LanguageDTO, LanguageListDTO, LanguageCreateDTO, LanguageUpdateDTO
 from domain.language.interfaces.repository import LanguageRepository
+from infrastructure.loaders.load_languages import load_languages_init_entities
 
 
 class LanguageService(
@@ -20,3 +21,11 @@ class LanguageService(
 
     def _set_acces_control_validators(self) -> None:
         ...
+
+    async def get_or_init(self) -> list[LanguageEntity]:
+        languages = await self.list()
+        if len(languages) == 0:
+            languages_entities = load_languages_init_entities(without_id=True)
+            for language in languages_entities:
+                await self.create(language)
+        return await self.list()

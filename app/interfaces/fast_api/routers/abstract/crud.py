@@ -38,9 +38,8 @@ class BaseCRUDApiViewSet[S: EntityCRUDService, E: BaseEntity, BIDTO: BaseItemDTO
 
     def __init__(self, router: APIRouter) -> None:
         self.router = router
-        self._set_routes()
 
-    def _set_routes(self) -> None:
+    def set_routes(self) -> None:
         if self.page_size:
             self.router.add_api_route(
                 "/",
@@ -60,7 +59,7 @@ class BaseCRUDApiViewSet[S: EntityCRUDService, E: BaseEntity, BIDTO: BaseItemDTO
             )
         if self.schema:
             self.router.add_api_route(
-                "/{id}/",
+                "/{id:int}/",
                 self.retrieve_view,
                 methods=["GET"],
                 response_model=self.schema,
@@ -75,14 +74,14 @@ class BaseCRUDApiViewSet[S: EntityCRUDService, E: BaseEntity, BIDTO: BaseItemDTO
                 tags=self.tags,
             )
             self.router.add_api_route(
-                "/{id}/",
+                "/{id:int}/",
                 self.update_view,
                 methods=["PUT"],
                 response_model=self.schema,
                 tags=self.tags,
             )
         self.router.add_api_route(
-            "/{id}/",
+            "/{id:int}/",
             self.delete_view,
             methods=["DELETE"],
             status_code=status.HTTP_204_NO_CONTENT,

@@ -75,11 +75,20 @@ services:
     networks:
       - kafka
 
+  kafka-topic-change:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - kafka
+    entrypoint: ["/bin/bash", "-c", "/change-topics.sh"]
+    volumes:
+      - ./kafka/change-topics.sh:/change-topics.sh
+    networks:
+      - kafka
+
   kafka_worker:
     build:
       context: ..
       dockerfile: tests_env/app_workers/Dockerfile
-    container_name: lare_test_kafka_worker
     command: ["faststream", "run", "interfaces.event_broker.kafka_chapter:app"]
     restart: unless-stopped
     depends_on:
@@ -114,7 +123,7 @@ services:
       dockerfile: tests_env/app/Dockerfile
     container_name: lare_test_app
     depends_on:
-      - db
+      - init_sentry_db
       - kafka
     environment:
       DATABASE_URL: postgres://test:test@db:5432/test_db
@@ -125,6 +134,8 @@ services:
       - redis
       - kafka
       - celery
+      - front
+      - back
 
   test_runner:
     build:
@@ -144,6 +155,9 @@ services:
 
   locust:
     container_name: lare_test_locust
+    depends_on:
+      - app
+      - kafka_worker
     build:
       context: ..
       dockerfile: tests_env/locust/Dockerfile
@@ -153,6 +167,8 @@ services:
     ports:
       - "8089:8089"
     volumes: []
+    networks:
+      - front
 
   kafka_exporter:
     image: danielqsj/kafka-exporter
@@ -241,6 +257,7 @@ services:
     networks:
       - database
       - redis
+      - back
 
   celery_worker:
     build:
@@ -267,3 +284,5 @@ networks:
   database:
   celery:
   redis:
+  front:
+  back:

@@ -13,12 +13,10 @@ TOPICS=(
 )
 
 for TOPIC in "${TOPICS[@]}"; do
-  echo "🔧 Creating topic: $TOPIC"
+  echo "🔧 Change topic: $TOPIC"
   kafka-topics \
-    --create \
-    --if-not-exists \
+    --alter \
     --bootstrap-server "$BOOTSTRAP_SERVER" \
-    --replication-factor 1 \
     --partitions 10 \
     --topic "$TOPIC"
 done
