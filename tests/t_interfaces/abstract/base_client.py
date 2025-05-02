@@ -12,6 +12,8 @@ from application.auth.dtos.password import PasswordLoginDTO
 from application.language.dtos import LanguageCreateDTO
 from core.config import settings
 from core.enums.dev.enviroment_types import EnviromentTypes
+from core.enums.events.broker_types import EventBrokerTypes
+from core.enums.events.streaming import EventStreamingTypes
 from core.enums.repository.types import RepositoryTypes
 from domain.account.entities import AccountEntity
 from domain.account.exceptions import AccountAlreadyExistsError
@@ -40,16 +42,23 @@ class BaseClientTest(ABC):
     route_auth_change_password = "/auth/change_password/"
 
     @staticmethod
-    def _get_auth_telegram_provider_data(valid: bool = True) -> TelegramProviderDataDTO:
-        fake_init_data = create_fake_telegram_provider_data()
+    def _get_auth_telegram_provider_data(valid: bool = True, user_id: int | None = None) -> TelegramProviderDataDTO:
+        fake_init_data = create_fake_telegram_provider_data(user_id)
         if valid is False:
             fake_init_data.init_data = fake_init_data.init_data.replace("hash=", "hash=a")
         return fake_init_data
+
+    @staticmethod
+    def _get_auth_headers(token: str) -> dict[str, str]:
+        return {"Authorization": f"Bearer {token}"}
 
     @pytest.fixture(autouse=True, scope="function")
     def set_config(self) -> None:
         settings.enviroment = EnviromentTypes.TESTING
         settings.repository_type = RepositoryTypes.TORTOISE
+        settings.event_broker_type = EventBrokerTypes.KAFKA
+        settings.default_event_streaming = EventStreamingTypes.REDIS
+        settings.event_streaming_timeout = 10
 
     @pytest.fixture(scope="function", autouse=True)
     async def app_lifespan(self) -> AsyncGenerator:
@@ -84,9 +93,6 @@ class BaseClientTest(ABC):
         with patch.dict("sys.modules", {"interfaces.fast_api.routers.auth": fake_auth_module}):
             import interfaces.fast_api.main as main_module
             reload(main_module)
-            print(settings.database_url)
-            print(settings.event_broker_type)
-            print(settings.kafka_bootstrap_servers)
             async with LifespanManager(main_module.app):
                 transport = ASGITransport(app=main_module.app)
                 async with AsyncClient(transport=transport, base_url="http://testserver") as c:

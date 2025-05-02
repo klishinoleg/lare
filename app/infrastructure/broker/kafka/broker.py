@@ -1,12 +1,14 @@
-from typing import Type, Callable, Awaitable
+from typing import Type, Callable, Awaitable, TYPE_CHECKING
 from faststream import Context, FastStream
-from application.abstract.events import BaseEvent, BaseEventHandler
 from core.config import settings
 from faststream.kafka import KafkaBroker
 from infrastructure.broker.base_broker import BaseBroker
 
+if TYPE_CHECKING:
+    from application.abstract.events import BaseEvent, BaseEventHandler
 
-class KafkaEventBroker[BEH: BaseEventHandler, BE: BaseEvent](BaseBroker):
+
+class KafkaEventBroker[BEH: "BaseEventHandler", BE: "BaseEvent"](BaseBroker):
     """
     Kafka implementation of event subscriber.
     """
@@ -33,3 +35,6 @@ class KafkaEventBroker[BEH: BaseEventHandler, BE: BaseEvent](BaseBroker):
 
     def before_start(self, func: Callable[[], Awaitable]) -> None:
         self.app.on_startup(func)
+
+    async def stop(self) -> None:
+        await self.app.stop()

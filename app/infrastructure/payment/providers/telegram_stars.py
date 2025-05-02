@@ -56,5 +56,6 @@ class TelegramStarsProvider(BasePaymentProvider[TelegramStatsProviderOptions]):
             "need_email": False,
             "need_shipping_address": False,
         }
-        await bot.send_invoice(**invoice)
+        async with bot.session:
+            await bot.send_invoice(**invoice)
         return None

@@ -11,64 +11,58 @@ from domain.finance.enums.transaction_type import TransactionType
 
 class BillCreatedEvent(BaseEvent, CreateBillContext):
     event_type: ClassVar = FinanceEventTypes.BILL_CREATED
+    bill_id: int
+    account_id: int
+    credits_amount: Decimal
+    cost: int
+    payment_service: PaymentService
 
 
-class PaymentCreatedEvent(BaseEvent):
-    event_type: ClassVar = FinanceEventTypes.PAYMENT_CREATED
+class BillPaymentEvent(BaseEvent):
+    event_type: ClassVar = FinanceEventTypes.BILL_PAYMENT
+    bill_id: int
     account_id: int
     credits_amount: Decimal
     cost: int
     currency: Currency
     payment_service: PaymentService
-    user_ip: str | None = None
     token: str | None = None
 
 
-class BillErrorEvent(BaseErrorEvent):
+class BillErrorEvent(BaseErrorEvent[FinanceEventTypes]):
     event_type: ClassVar = FinanceEventTypes.BILL_ERROR
     account_id: int
     payment_service: PaymentService | None
 
 
-class PaymentPaidEvent(BaseEvent):
-    event_type: ClassVar = FinanceEventTypes.PAYMENT_PAID
+class BillPaidEvent(BaseEvent):
+    event_type: ClassVar = FinanceEventTypes.BILL_PAID
     account_id: int
     transaction: str
     payment_data: dict
     token: str | None
     bill_id: int | None
+    payment_service: PaymentService
 
 
-class PaymentConfirmedEvent(BaseEvent):
-    event_type: ClassVar = FinanceEventTypes.PAYMENT_CONFIRMED
+class BillConfirmedEvent(BaseEvent):
+    event_type: ClassVar = FinanceEventTypes.BILL_CONFIRMED
     account_id: int
     transaction: str
     payment_data: dict
-    token: str | None
-    bill_id: int | None
-
-
-class BillSuccessfulEvent(BaseEvent):
-    event_type: ClassVar = FinanceEventTypes.BILL_SUCCESSFUL
     bill_id: int
-    account_id: int
-
-
-class PaymentRefundedEvent(BaseEvent):
-    event_type: ClassVar = FinanceEventTypes.PAYMENT_REFUNDED
-    account_id: int
-    transaction: str
-    payment_data: dict
     token: str | None
-    bill_id: int | None
+    payment_service: PaymentService
 
 
 class BillRefundedEvent(BaseEvent):
     event_type: ClassVar = FinanceEventTypes.BILL_REFUNDED
-    bill_id: int
     account_id: int
     transaction: str
+    payment_data: dict
     token: str | None
+    bill_id: int | None
+    payment_service: PaymentService
 
 
 class UsageCreatedEvent(BaseEvent):
@@ -87,10 +81,12 @@ class UsageCancelledEvent(BaseEvent):
     account_id: int
 
 
-class UsageErrorEvent(BaseErrorEvent):
+class UsageErrorEvent(BaseErrorEvent[FinanceEventTypes]):
     event_type: ClassVar = FinanceEventTypes.USAGE_ERROR
-    usage_id: int
+    usage_id: int | None
     account_id: int
+    usage_type: AccountUsageType | None
+    credits_amount: Decimal | None
 
 
 class TransactionCreatedEvent(BaseEvent):
@@ -102,6 +98,11 @@ class TransactionCreatedEvent(BaseEvent):
     bill_id: int | None = None
 
 
-class TransactionErrorEvent(BaseErrorEvent):
+class TransactionStartBonusEvent(BaseEvent):
+    event_type: ClassVar = FinanceEventTypes.TRANSACTION_START_BONUS
+    account_id: int
+
+
+class TransactionErrorEvent(BaseErrorEvent[FinanceEventTypes]):
     event_type: ClassVar = FinanceEventTypes.TRANSACTION_ERROR
     account_id: int

@@ -7,6 +7,7 @@ from application.auth.dtos import AuthResponseDTO, AUIDDTO, AuthProfileDTO
 from domain.account.entities import AccountEntity
 from application.account.dtos import AccountDTO
 from domain.auth_profile.interfaces.repository import AuthProfileRepository
+from core.config import settings
 
 
 class AuthViaProfileService:
@@ -19,8 +20,10 @@ class AuthViaProfileService:
 
     def __init__(
             self,
-            repository_type: RepositoryTypes = RepositoryTypes.TORTOISE
+            repository_type: RepositoryTypes | None = None
     ):
+        if repository_type is None:
+            repository_type = settings.repository_type
         self.account_repository = DIRepository.get_repository(AccountRepository, repository_type)()
         self.auth_profile_repository = DIRepository.get_repository(AuthProfileRepository, repository_type)()
 
@@ -31,7 +34,7 @@ class AuthViaProfileService:
             for o in profiles
         ]
 
-    async def authenticate(self, dto: AUIDDTO) -> AuthResponseDTO:
+    async def authenticate(self, dto: AUIDDTO, is_safe: bool = False) -> AuthResponseDTO:
         """
         Authenticate user based on profile provider data.
 
@@ -46,9 +49,11 @@ class AuthViaProfileService:
 
         Returns:
             AuthResponseDTO: Auth token + user data.
+            :param dto: AUIDDTO
+            :param is_safe: bool
         """
         provider = AuthProviderFactory.get_provider(dto.provider_type)
-        profile_entity = await provider.validate_and_parse(dto.provider_data)
+        profile_entity = await provider.validate_and_parse(dto.provider_data, is_safe)
 
         existing_profile = await self.auth_profile_repository.get_by_provider_id(
             profile_entity.provider_id,

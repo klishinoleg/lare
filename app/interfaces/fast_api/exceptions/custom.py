@@ -2,6 +2,7 @@ from fastapi import FastAPI, status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from application.events.streaming.exceptions import StreamingTimeoitException
 from domain.abstract import DomainValidationException, EntityNotFoundException
 
 
@@ -19,6 +20,19 @@ def register_exception_handler(app: FastAPI) -> None:
     Args:
         app (FastAPI): The FastAPI application instance to bind the handlers to.
     """
+
+    @app.exception_handler(StreamingTimeoitException)
+    async def streaming_timeout_handler(request: Request, exc: StreamingTimeoitException) -> JSONResponse:
+        return JSONResponse(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            content={"detail": [
+                {
+                    "loc": ["body"],
+                    "msg": str(exc),
+                    "type": type(exc).__name__
+                }
+            ]},
+        )
 
     @app.exception_handler(DomainValidationException)
     async def exception_handler(request: Request, exc: DomainValidationException) -> JSONResponse:

@@ -1,13 +1,11 @@
 from application.abstract.events import BaseEventHandler
 from application.events.handler_groups import HandlerGroups
-from application.finance.dtos.account_transaction import CreateAccountTransactionDTO
-from application.finance.events import UsageCancelledEvent
-from application.finance.services.account_transaction_service import AccountTransactionService
-from domain.finance.entities import AccountTransactionEntity
-from domain.finance.enums.transaction_type import TransactionType
+from application.finance.events import UsageCancelledEvent, UsageErrorEvent
+from application.finance.utils.transaction_factory import create_transaction_from_dto, \
+    make_transaction_dto_from_usage_event
 
 
-class UsageCancelledEventHandler(BaseEventHandler[UsageCancelledEvent]):
+class UsageCancelledEventHandler(BaseEventHandler[UsageCancelledEvent, UsageErrorEvent]):
     """
     Handles UsageCancelEvent: Create Cancel usage transaction.
     """
@@ -15,13 +13,7 @@ class UsageCancelledEventHandler(BaseEventHandler[UsageCancelledEvent]):
     event_handler_group: HandlerGroups = HandlerGroups.FINANCE
 
     @classmethod
-    async def handler(cls, event: UsageCancelledEvent, group_id: int | None) -> None:
-        transaction_service = AccountTransactionService()
-        create_transaction_dto = CreateAccountTransactionDTO(
-            account_id=event.account_id,
-            transaction_type=TransactionType.AI_USAGE_CANCEL,
-            credits_amount=event.credits_amount,
-            usage_id=event.usage_id
-        )
-        transaction_entity = AccountTransactionEntity(**create_transaction_dto.model_dump())
-        await transaction_service.create(transaction_entity)
+    @BaseEventHandler.with_error(UsageErrorEvent)
+    async def handler(cls, event: UsageCancelledEvent) -> None:
+        create_transaction_dto = make_transaction_dto_from_usage_event(event)
+        await create_transaction_from_dto(create_transaction_dto, pid=event.pid)

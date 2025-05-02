@@ -41,7 +41,7 @@ class ChapterCreationCompletedEvent(BaseEvent):
     account_id: int
 
 
-class ChapterCreationErrorEvent(BaseErrorEvent):
+class ChapterCreationErrorEvent(BaseErrorEvent[ChapterEventTypes]):
     """
     Event: Error occurred during chapter creation.
     """

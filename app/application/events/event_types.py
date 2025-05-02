@@ -15,11 +15,9 @@ class ChapterEventTypes(EventTypes):
 
 class FinanceEventTypes(EventTypes):
     BILL_CREATED = "finance.bill.created"
-    PAYMENT_CREATED = "finance.payment.created"
-    PAYMENT_PAID = "finance.payment.paid"
-    PAYMENT_CONFIRMED = "finance.payment.confirmed"
-    BILL_SUCCESSFUL = "finance.bill.successful"
-    PAYMENT_REFUNDED = "finance.payment.refunded"
+    BILL_PAYMENT = "finance.bill.payment"
+    BILL_PAID = "finance.bill.paid"
+    BILL_CONFIRMED = "finance.bill.confirmed"
     BILL_REFUNDED = "finance.bill.refunded"
     BILL_ERROR = "finance.bill.error"
 
@@ -27,5 +25,6 @@ class FinanceEventTypes(EventTypes):
     USAGE_CANCELLED = "finance.usage.cancelled"
     USAGE_ERROR = "finance.usage.error"
 
+    TRANSACTION_START_BONUS = "finance.transaction.startbonus"
     TRANSACTION_CREATED = "finance.transaction.created"
     TRANSACTION_ERROR = "finance.transaction.error"

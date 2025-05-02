@@ -1,8 +1,9 @@
 from __future__ import annotations
 from domain.abstract import EntityRepository, BaseEntity
 from abc import ABC, abstractmethod
-from typing import List, Type
+from typing import List, Type, Callable, Any
 from .models.abstract import AbstractModel
+from core.db import get_master_connection, get_slave_connection
 
 
 class BaseTortoiseRepository[E: BaseEntity, TM: AbstractModel](EntityRepository[E], ABC):
@@ -33,6 +34,36 @@ class BaseTortoiseRepository[E: BaseEntity, TM: AbstractModel](EntityRepository[
             Insert or update an entity in the database.
     """
 
+    _use_master: bool = False
+
+    def __init__(self, *args: Any, use_master: bool = False, **kwargs: Any) -> None:
+        self._use_master = use_master
+        super().__init__(*args, **kwargs)
+
+    @staticmethod
+    def read(use_master: bool = False) -> Callable:
+        def decorator(func: Callable) -> Callable:
+            async def wrapper(self: Any, *args: tuple, **kwargs: dict) -> Any:
+                connection = get_master_connection() if use_master or self._use_master else get_slave_connection()
+                async with connection.acquire_connection():
+                    return await func(self, *args, **kwargs)
+
+            return wrapper
+
+        return decorator
+
+    @staticmethod
+    def write() -> Callable:
+        def decorator(func: Callable) -> Callable:
+            async def wrapper(self: Any, *args: tuple, **kwargs: dict) -> Any:
+                connection = get_master_connection()
+                async with connection.acquire_connection():
+                    return await func(self, *args, **kwargs)
+
+            return wrapper
+
+        return decorator
+
     @property
     @abstractmethod
     def model(self) -> Type[TM]:
@@ -58,6 +89,7 @@ class BaseTortoiseRepository[E: BaseEntity, TM: AbstractModel](EntityRepository[
         """
         ...
 
+    @read()
     async def get_by_id(self, id: int) -> E | None:
         """
         Retrieve an entity by its ID.
@@ -71,6 +103,7 @@ class BaseTortoiseRepository[E: BaseEntity, TM: AbstractModel](EntityRepository[
         record = await self.model.get_or_none(id=id)
         return await self.to_entity(record) if record else None
 
+    @read()
     async def list(self) -> List[E]:
         """
         Retrieve all entities from the database.
@@ -81,6 +114,7 @@ class BaseTortoiseRepository[E: BaseEntity, TM: AbstractModel](EntityRepository[
         records = await self.model.all()
         return [await self.to_entity(r) for r in records]
 
+    @write()
     async def delete(self, id: int) -> bool:
         """
         Delete an entity by ID.
@@ -97,6 +131,7 @@ class BaseTortoiseRepository[E: BaseEntity, TM: AbstractModel](EntityRepository[
         await o.delete()
         return True
 
+    @write()
     async def save(self, entity: E) -> E | None:
         """
         Save (create or update) an entity to the database.

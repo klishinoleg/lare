@@ -8,12 +8,12 @@ from domain.abstract import BaseEntity
 class Table[E: BaseEntity]:
     def __init__(self) -> None:
         self.entities: dict[int, E] = {}
-        self.counter: int = 1
+        self.counter: int = 0
         super().__init__()
 
     def clear(self) -> None:
         self.entities = {}
-        self.counter = 1
+        self.counter = 0
 
 
 class BaseMockRepository[E: BaseEntity](EntityRepository[E], ABC):
@@ -101,7 +101,9 @@ class BaseMockRepository[E: BaseEntity](EntityRepository[E], ABC):
             E | None: The stored entity.
         """
         if entity.id is None:
-            entity.id = self.counter
             self.counter += 1
+            while self.entities.get(self.counter):
+                self.counter += 1
+            entity.id = self.counter
         self.entities[entity.id] = entity
         return entity

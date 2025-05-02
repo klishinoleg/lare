@@ -11,15 +11,15 @@ class TortoiseChapterRepository(BaseTortoiseRepository[ChapterModel, ChapterEnti
     """
     model = ChapterModel
 
-    async def to_entity(self, model: ChapterModel) -> ChapterEntity:
+    async def to_entity(self, o: ChapterModel) -> ChapterEntity:
         return ChapterEntity(
-            id=model.id,
-            name=model.name,
-            book_id=model.book_id,
-            account_id=model.account_id,
-            source_url=model.source_url,
-            position=model.position,
-            is_ready=model.is_ready,
+            id=o.id,
+            name=o.name,
+            book_id=o.book_id,
+            account_id=o.account_id,
+            source_url=o.source_url,
+            position=o.position,
+            is_ready=o.is_ready,
         )
 
     async def get_by_book(self, book_id: int, account_id: int) -> list[ChapterEntity]:

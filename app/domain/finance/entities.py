@@ -23,6 +23,7 @@ class AccountTransactionEntity(BaseEntity, TimestampMixin):
 class AccountUsageEntity(BaseEntity, TimestampMixin):
     account_id: int
     credits_amount: Decimal
+    usage_id: int | None = None
     usage_type: AccountUsageType
     usage_amount: int
     canceled_at: datetime | None = None

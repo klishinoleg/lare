@@ -20,6 +20,11 @@ class AccountTransactionNotFound(AccountTransactionException, EntityNotFoundExce
     ...
 
 
+class AccountTransactionStartBonusExist(AccountTransactionException):
+    """Raised when an account has a start bonus."""
+    ...
+
+
 class AccountTransactionPermissionDenied(AccountTransactionException, PermissionDenied):
     """Permission denied for modifying an account transaction."""
     ...
@@ -61,4 +66,14 @@ class PaymentCreationError(BillException, EntityNotFoundException):
 
 class BillPermissionDenied(BillException, PermissionDenied):
     """Permission denied for modifying a bill."""
+    ...
+
+
+class BillRetrySuccessError(BillException):
+    """When the bill already successfully."""
+    ...
+
+
+class BillRetryRefundError(BillException):
+    """When the bill already refunded."""
     ...

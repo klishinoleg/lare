@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
-from uuid import UUID
 
 
 class BaseEventDeduplicatorService(ABC):
     @abstractmethod
-    async def is_duplicate(self, event_id: UUID) -> bool:
+    async def is_duplicate(self, event_id: str) -> bool:
         """
         Check whether event ID has already been processed.
         """

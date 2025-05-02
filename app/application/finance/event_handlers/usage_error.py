@@ -4,12 +4,12 @@ from application.events.handler_groups import HandlerGroups
 from core.di.logger import DILogger
 
 
-class UsageErrorEventHandler(BaseEventHandler[UsageErrorEvent]):
+class UsageErrorEventHandler(BaseEventHandler[UsageErrorEvent, UsageErrorEvent]):
     event_type = UsageErrorEvent.event_type
     event_handler_group: HandlerGroups = HandlerGroups.FINANCE
 
     @classmethod
-    async def handler(cls, event: UsageErrorEvent, group_id: int | None) -> None:
+    async def handler(cls, event: UsageErrorEvent) -> None:
         """
         Handle UsageErrorEventEvent: log the error.
         """

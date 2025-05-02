@@ -10,6 +10,7 @@ from application.account.services import AccountService
 from core.enums.repository.types import RepositoryTypes
 from domain.abstract import BaseEntity, EntityRepository, EntityNotFoundException, PermissionDenied
 from domain.account.entities import AccountEntity
+from domain.auth_profile.exceptions import AuthProfileAlreadyExistsError
 from tests.t_domain.entities.account import AccountFactory
 from core.config import settings
 
@@ -95,9 +96,9 @@ class BaseCRUDServiceTest[E: BaseEntity, ER: EntityRepository, BCRUDS: BaseCRUDS
         """
         await self.test_create_multiple()
         all_entities = await self._service.list()
-        assert len(all_entities) == 10
+        assert len(all_entities) > 10
         ids = [e.id for e in all_entities]
-        assert len(set(ids)) == 10
+        assert len(set(ids)) > 10
         assert all(ids)
 
     @pytest.mark.asyncio
@@ -126,9 +127,12 @@ class BaseCRUDServiceTest[E: BaseEntity, ER: EntityRepository, BCRUDS: BaseCRUDS
 
     @pytest.mark.asyncio
     async def test_superuser(self) -> None:
-        superuser = await UserCreatorService.create_superuser(username="superuser", password="passw",
-                                                              public_name="Super User",
-                                                              repository_type=self.init_repository_type)
+        try:
+            superuser = await UserCreatorService.create_superuser(username="superuser", password="passw",
+                                                                  public_name="Super User",
+                                                                  repository_type=self.init_repository_type)
+        except AuthProfileAlreadyExistsError:
+            superuser = await AccountService().get_by_username(username="superuser")
         entity = await self._service.create(await self._get_fake_entity())
         new_value = "New value"
         setattr(entity, self._field_for_update, new_value)

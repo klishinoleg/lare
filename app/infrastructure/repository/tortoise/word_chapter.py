@@ -22,8 +22,10 @@ class TortoiseWordChapterRepository(BaseTortoiseRepository[WordChapter, WordChap
             segment_id=o.segment_id
         )
 
+    @BaseTortoiseRepository.read()
     async def get_by_chapter(self, chapter_id: int) -> list[WordChapter]:
         return [await self.to_entity(o) for o in await self.model.filter(chapter_id=chapter_id).all()]
 
+    @BaseTortoiseRepository.write()
     async def delete_by_chapter(self, chapter_id: int) -> None:
         await self.model.filter(chapter_id=chapter_id).delete()

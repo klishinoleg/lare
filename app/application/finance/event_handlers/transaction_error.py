@@ -4,12 +4,13 @@ from application.events.handler_groups import HandlerGroups
 from core.di.logger import DILogger
 
 
-class TransactionErrorEventHandler(BaseEventHandler[TransactionErrorEvent]):
+class TransactionErrorEventHandler(BaseEventHandler[TransactionErrorEvent, TransactionErrorEvent]):
     event_type = TransactionErrorEvent.event_type
     event_handler_group: HandlerGroups = HandlerGroups.FINANCE
 
     @classmethod
-    async def handler(cls, event: TransactionErrorEvent, group_id: int | None) -> None:
+    @BaseEventHandler.with_streaming
+    async def handler(cls, event: TransactionErrorEvent) -> None:
         """
         Handle TransactionErrorEventHandler: log the error.
         """

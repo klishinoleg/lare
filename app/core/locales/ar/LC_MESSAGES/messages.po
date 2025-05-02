@@ -1,0 +1,213 @@
+# Arabic translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-04-30 17:58+0300\n"
+"PO-Revision-Date: 2025-04-30 17:59+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ar\n"
+"Language-Team: ar <LL@li.org>\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : "
+"n%100>=3 && n%100<=10 ? 3 : n%100>=0 && n%100<=2 ? 4 : 5);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: core/messages/actions.py:13
+#, python-brace-format
+msgid "Chapter {} created, please await to parsing content finished"
+msgstr ""
+
+#: core/messages/bot.py:16
+#, python-brace-format
+msgid "*👋 Hello, {}!* Welcome to *Lazy Reader*"
+msgstr ""
+
+#: core/messages/bot.py:17
+msgid "– your ultimate tool for reading, translation, and language learning! 📖✨"
+msgstr ""
+
+#: core/messages/bot.py:19
+msgid "📚 *What can you do with Lazy Reader?*"
+msgstr ""
+
+#: core/messages/bot.py:20
+msgid "🔹 *Create your own books* and add articles to them 📜"
+msgstr ""
+
+#: core/messages/bot.py:21
+msgid "🔹 *Automatically fetch subtitles* from popular websites 🎬"
+msgstr ""
+
+#: core/messages/bot.py:22
+msgid "🔹 *Translate and listen to text* in multiple languages 🌍🔊"
+msgstr ""
+
+#: core/messages/bot.py:23
+msgid "🔹 *Break down text into phrases and words* for easy learning 🔠"
+msgstr ""
+
+#: core/messages/bot.py:24
+msgid "🔹 *Learn new words and phrases* with the Telegram bot 🤖"
+msgstr ""
+
+#: core/messages/bot.py:25
+msgid "🔹 *Analyze word etymology* and discover their origins 🔍"
+msgstr ""
+
+#: core/messages/bot.py:26
+msgid "🔹 *Discuss language rules* and ask AI for explanations 🤖💡"
+msgstr ""
+
+#: core/messages/bot.py:28
+msgid ""
+"🎉 *Ready to start?* Click the button below and explore a new world of "
+"learning!"
+msgstr ""
+
+#: core/messages/bot.py:34
+#, python-brace-format
+msgid "Hello, {}!"
+msgstr ""
+
+#: core/messages/bot.py:35
+msgid "Thank you for using <b>Lazy Reader</b>."
+msgstr ""
+
+#: core/messages/bot.py:36
+msgid "We’re here to help you improve your reading and language skills! 🚀"
+msgstr ""
+
+#: core/messages/bot.py:41
+msgid "🚀 Open the App"
+msgstr ""
+
+#: core/messages/bot.py:45
+#, python-brace-format
+msgid "Start bonus credits have been added to your account: {}★"
+msgstr ""
+
+#: core/messages/bot.py:49
+msgid "You have already sent a start bonus."
+msgstr ""
+
+#: core/messages/bot.py:53
+msgid "You have requested a start bonus."
+msgstr ""
+
+#: core/messages/bot.py:57
+#, python-brace-format
+msgid "Bill successful, credits have been added to your account: {}★"
+msgstr ""
+
+#: core/messages/bot.py:61
+#, python-brace-format
+msgid "Confirm add credits for {account.public_name} {account.username}"
+msgstr ""
+
+#: core/messages/common.py:12
+msgid "Yes"
+msgstr ""
+
+#: core/messages/common.py:16
+msgid "No"
+msgstr ""
+
+#: core/messages/exceptions.py:19
+#, python-brace-format
+msgid "Username {} already exists"
+msgstr ""
+
+#: core/messages/exceptions.py:23
+#, python-brace-format
+msgid "Invalid auth profile data: {}"
+msgstr ""
+
+#: core/messages/exceptions.py:27
+#, python-brace-format
+msgid "No auth provider registered for: {}"
+msgstr ""
+
+#: core/messages/exceptions.py:31
+msgid "Invalid token"
+msgstr ""
+
+#: core/messages/exceptions.py:35
+#, python-brace-format
+msgid "Account not found {}"
+msgstr ""
+
+#: core/messages/exceptions.py:39
+msgid "Invalid Telegram hash"
+msgstr ""
+
+#: core/messages/exceptions.py:43
+msgid "Telegram auth expired"
+msgstr ""
+
+#: core/messages/exceptions.py:47
+msgid "Password profile not found"
+msgstr ""
+
+#: core/messages/exceptions.py:51
+msgid "Invalid username or password"
+msgstr ""
+
+#: core/messages/exceptions.py:55
+#, python-brace-format
+msgid "Access denied for {} by {}"
+msgstr ""
+
+#: core/messages/exceptions.py:59
+msgid "Wrong repeat password"
+msgstr ""
+
+#: core/messages/exceptions.py:63
+#, python-brace-format
+msgid "For make payment you have to create auth profile: {}"
+msgstr ""
+
+#: core/messages/exceptions.py:67
+#, python-brace-format
+msgid "Event streaming timeout for key {}: {} seconds"
+msgstr ""
+
+#: core/messages/finance.py:14
+msgid "Purchase Credits"
+msgstr ""
+
+#: core/messages/finance.py:18
+msgid "Purchase Credits to Use AI in the App."
+msgstr ""
+
+#: core/messages/finance.py:22
+#, python-brace-format
+msgid "Credits: {} 💰"
+msgstr ""
+
+#: core/messages/finance.py:26
+msgid "You already have a start bonus"
+msgstr ""
+
+#: core/messages/finance.py:30
+msgid "Bill has been confirmed successfully."
+msgstr ""
+
+#: core/messages/finance.py:34
+msgid "Bill has been deleted."
+msgstr ""
+
+#: core/messages/finance.py:38
+msgid "Format should be: credits:account_id:credits_amount:cost:RUB"
+msgstr ""
+
+#: core/messages/finance.py:42
+msgid "Incorrect credits or cost format"
+msgstr ""
+

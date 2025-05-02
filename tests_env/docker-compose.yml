@@ -72,6 +72,7 @@ services:
     entrypoint: ["/bin/bash", "-c", "/create-topics.sh"]
     volumes:
       - ./kafka/create-topics.sh:/create-topics.sh
+      - ./kafka/topics.conf:/topics/topics.conf
     networks:
       - kafka
 
@@ -89,20 +90,22 @@ services:
     build:
       context: ..
       dockerfile: tests_env/app_workers/Dockerfile
-    command: ["faststream", "run", "interfaces.event_broker.kafka_chapter:app"]
+    image: lazyreader/kafka_worker:latest
     restart: unless-stopped
-    depends_on:
-      - kafka-topic-init
-      - db
-      - redis
-      - kafka_exporter
-      - kafka_ui
+    command: ["faststream", "run", "${KAFKA_APP}"]
     env_file:
       - .env
+    environment:
+      - KAFKA_APP=${KAFKA_APP}
     networks:
       - kafka
       - database
       - redis
+    depends_on:
+      - kafka_ui
+      - redis
+      - db
+      - kafka-topic-init
 
   kafka_ui:
     image: provectuslabs/kafka-ui:latest

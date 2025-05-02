@@ -1,8 +1,9 @@
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Callable, Awaitable, Type
+from typing import Callable, Awaitable, Type, TYPE_CHECKING
 
-from application.abstract.events import BaseEventHandler, BaseEvent
+if TYPE_CHECKING:
+    from application.abstract.events import BaseEventHandler, BaseEvent
 
 
 class BaseBroker(ABC):
@@ -34,3 +35,6 @@ class BaseBroker(ABC):
 
     def before_start(self, func: Callable[[], Awaitable]) -> None:
         self.before_start_handlers.append(func)
+
+    async def stop(self) -> None:
+        ...

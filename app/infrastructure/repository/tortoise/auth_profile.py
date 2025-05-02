@@ -38,6 +38,7 @@ class TortoiseAuthProfileRepository(BaseTortoiseRepository[AuthProfileEntity, Au
             language_code=o.language_code
         )
 
+    @BaseTortoiseRepository.read()
     async def get_by_provider_id(self, provider_id: str, provider_type: AuthProviderType) -> AuthProfileEntity | None:
         """
         Find an auth profile by provider ID.
@@ -53,8 +54,10 @@ class TortoiseAuthProfileRepository(BaseTortoiseRepository[AuthProfileEntity, Au
         profile = await self.model.get_or_none(provider_type=provider_type, provider_id=provider_id)
         return await self.to_entity(profile) if profile else None
 
+    @BaseTortoiseRepository.read()
     async def get_list_by_account_id(self, account_id: int) -> list[AuthProfileEntity]:
         return [await self.to_entity(o) for o in await self.model.filter(account_id=account_id).all()]
 
+    @BaseTortoiseRepository.read()
     async def get_by_account_id(self, account_id: int, provider_type: AuthProviderType) -> AuthProfileEntity | None:
         return await self.to_entity(await self.model.filter(account_id=account_id, provider_type=provider_type).first())

@@ -1,5 +1,7 @@
 from __future__ import annotations
 from datetime import datetime
+from decimal import Decimal
+
 from pydantic import Field
 
 from application.abstract.dtos import BaseCreateItemDTO, BaseUpdateItemDTO, BaseItemsListDTO, BaseItemDTO
@@ -25,7 +27,7 @@ class AccountDTO(BaseItemDTO):
     created_at: datetime = Field(..., description="Timestamp when the account was created")
     updated_at: datetime = Field(..., description="Timestamp of the last account update")
     is_active: bool = Field(..., description="Indicates if the account is currently active")
-    credits: float = Field(..., description="Current credit balance of the account")
+    credits: Decimal = Field(..., description="Current credit balance of the account")
 
 
 class AccountListDTO(BaseItemsListDTO):

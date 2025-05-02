@@ -1,4 +1,5 @@
 from domain.finance.entities import BillEntity
+from domain.finance.exceptions import BillRetrySuccessError, BillRetryRefundError
 from domain.finance.interfaces import BillRepository
 from application.finance.dtos.bill import (
     CreateBillDTO,
@@ -30,3 +31,19 @@ class BillService(
     update_dto = UpdateBillDTO
     item_dto = BillDTO
     list_dto = BillListDTO
+
+    async def check_bill_for_payment(self, bill_id: int) -> BillEntity:
+        bill = await self.get_by_id(bill_id)
+        if not bill:
+            raise BillRetrySuccessError("Bill not found")
+        if bill.success_time:
+            raise BillRetrySuccessError("Bill already paid")
+        return bill
+
+    async def check_bill_for_refund(self, bill_id: int) -> BillEntity:
+        bill = await self.get_by_id(bill_id)
+        if not bill:
+            raise BillRetryRefundError("Bill not found")
+        if bill.refund_time:
+            raise BillRetryRefundError("Bill already refunded")
+        return bill

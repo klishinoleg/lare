@@ -15,6 +15,9 @@ class AccessRoleModel(Model):
     ORM model representing a user's global access role.
     """
 
+    if TYPE_CHECKING:
+        account_id: int
+
     id = fields.IntField(primary_key=True)
     account: fields.OneToOneRelation["AccountModel"] = fields.OneToOneField(
         "models.AccountModel",

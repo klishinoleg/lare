@@ -1,26 +1,24 @@
 #!/bin/bash
-sleep 10
 set -e
 
-BOOTSTRAP_SERVER="kafka:29092"
+BOOTSTRAP_SERVER=${BOOTSTRAP_SERVER:-kafka:29092}
+TOPIC_CONFIG=${TOPIC_CONFIG:-/topics/topics.conf}
 
-TOPICS=(
-  "chapter.text.processed"
-  "chapter.words.saved"
-  "chapter.create.requested"
-  "chapter.creation.completed"
-  "chapter.creation.error"
-)
+echo "🔧 Creating topics from $TOPIC_CONFIG"
 
-for TOPIC in "${TOPICS[@]}"; do
-  echo "🔧 Creating topic: $TOPIC"
+while IFS='=' read -r TOPIC PARTITIONS || [[ -n "$TOPIC" ]]; do
+  TOPIC=$(echo "$TOPIC" | tr -d '[:space:]')
+  PARTITIONS=$(echo "$PARTITIONS" | tr -d '[:space:]')
+  if [[ -z "$TOPIC" || "$TOPIC" == \#* ]]; then
+    continue
+  fi
+  echo "➡️ Creating topic '$TOPIC' with $PARTITIONS partitions"
   kafka-topics \
     --create \
     --if-not-exists \
     --bootstrap-server "$BOOTSTRAP_SERVER" \
     --replication-factor 1 \
-    --partitions 10 \
+    --partitions "$PARTITIONS" \
     --topic "$TOPIC"
-done
-
-echo "✅ All topics created or already exist"
+done < "$TOPIC_CONFIG"
+echo "✅ Topic creation finished"
