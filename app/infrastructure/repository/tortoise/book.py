@@ -21,5 +21,6 @@ class TortoiseBookRepository(BaseTortoiseRepository[BookEntity, BookModel], Book
             created_at=o.created_at
         )
 
+    @BaseTortoiseRepository.read()
     async def get_by_account(self, account_id: int) -> list[BookEntity]:
         return [await self.to_entity(o) for o in await self.model.filter(account_id=account_id).all()]

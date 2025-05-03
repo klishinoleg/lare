@@ -24,13 +24,13 @@ class ChapterService(
         Accessor.register(ChapterEntity, OwnedByAccountValidator(), ChapterPermissionDenied)
         Accessor.register(ChapterEntity, ChapterAccessValidator(), ChapterPermissionDenied)
 
-    async def create_with_text(self, entity: ChapterEntity, text: str) -> ChapterEntity:
+    async def create_with_text(self, entity: ChapterEntity, text: str, pid: str | None = None) -> ChapterEntity:
         from application.book.event_handlers.chapter.create_requested import ChapterCreateRequestedEvent
         chapter_entity = await self.create(entity)
         await DIPublisher.publish(
             payload=ChapterCreateRequestedEvent(book_id=chapter_entity.book_id,
                                                 chapter_id=chapter_entity.id,
-                                                text=text),
+                                                text=text, pid=pid),
             group_id=f"book:{chapter_entity.book_id}"
         )
         return chapter_entity

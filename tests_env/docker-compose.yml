@@ -72,6 +72,7 @@ services:
     entrypoint: ["/bin/bash", "-c", "/create-topics.sh"]
     volumes:
       - ./kafka/create-topics.sh:/create-topics.sh
+      - ./kafka/topics.conf:/topics/topics.conf
     networks:
       - kafka
 
@@ -85,24 +86,43 @@ services:
     networks:
       - kafka
 
-  kafka_worker:
+  kafka_worker_chapter:
     build:
       context: ..
       dockerfile: tests_env/app_workers/Dockerfile
-    command: ["faststream", "run", "interfaces.event_broker.kafka_chapter:app"]
+    image: lazyreader/kafka_worker:latest
     restart: unless-stopped
-    depends_on:
-      - kafka-topic-init
-      - db
-      - redis
-      - kafka_exporter
-      - kafka_ui
+    command: ["faststream", "run", "interfaces.event_broker.kafka_chapter:app"]
     env_file:
       - .env
     networks:
       - kafka
       - database
       - redis
+    depends_on:
+      - kafka_ui
+      - redis
+      - db
+      - kafka-topic-init
+
+  kafka_worker_finance:
+    build:
+      context: ..
+      dockerfile: tests_env/app_workers/Dockerfile
+    image: lazyreader/kafka_worker:latest
+    restart: unless-stopped
+    command: ["faststream", "run", "interfaces.event_broker.kafka_finance:app"]
+    env_file:
+      - .env
+    networks:
+      - kafka
+      - database
+      - redis
+    depends_on:
+      - kafka_ui
+      - redis
+      - db
+      - kafka-topic-init
 
   kafka_ui:
     image: provectuslabs/kafka-ui:latest
@@ -124,7 +144,8 @@ services:
     container_name: lare_test_app
     depends_on:
       - init_sentry_db
-      - kafka
+      - kafka_worker_chapter
+      - kafka_worker_finance
     environment:
       DATABASE_URL: postgres://test:test@db:5432/test_db
     ports:
@@ -144,7 +165,6 @@ services:
     container_name: lare_test_runner
     depends_on:
       - app
-      - kafka_worker
     environment:
       BASE_URL: http://app:8000
     command: ["sh", "./run_tests.sh"]
@@ -157,7 +177,8 @@ services:
     container_name: lare_test_locust
     depends_on:
       - app
-      - kafka_worker
+      - kafka_worker_finance
+      - kafka_worker_chapter
     build:
       context: ..
       dockerfile: tests_env/locust/Dockerfile

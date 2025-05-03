@@ -9,10 +9,12 @@ from infrastructure.repository.tortoise.models.access_role import AccessRoleMode
 class TortoiseAccessRoleRepository(BaseTortoiseRepository[AccessRoleEntity, AccessRoleModel], AccessRoleRepository):
     model = AccessRoleModel
 
+    @BaseTortoiseRepository.read()
     async def get_account_role(self, account_id: int) -> AccessRole:
         role_obj = await self.model.filter(account_id=account_id).first()
         return role_obj.role if role_obj else AccessRole.NOT_ROLE
 
+    @BaseTortoiseRepository.read()
     async def has_role(self, account_id: int, target: AccessRole) -> bool:
         return await super().has_role(account_id, target)
 

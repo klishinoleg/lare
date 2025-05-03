@@ -1,7 +1,6 @@
 from __future__ import annotations
 from abc import ABC
 from typing import Optional, List, Type
-
 from application.abstract.exceptions import RepositoryIsNotSet
 from core.di.repository import DIRepository
 from core.enums.repository.types import RepositoryTypes
@@ -201,12 +200,13 @@ class BaseCRUDService[E: BaseEntity, AR: EntityRepository, BIDTO: BaseItemDTO, B
             return getattr(entity, "set_update_now")()
         return entity
 
-    async def delete(self, entity: E, account: AccountEntity) -> None:
+    async def delete(self, entity: E, account: AccountEntity | None = None, is_system: bool = False) -> None:
         """
         Delete entity by ID or raise not_found_exception.
         """
         if not self.repository:
             raise RepositoryIsNotSet()
-        await Accessor.or_raise(entity, account, self.access_role, self.repository_type)
+        if not is_system:
+            await Accessor.or_raise(entity, account, self.access_role, self.repository_type)
         if not await self.repository.delete(entity.id):
             raise self.not_found_exception

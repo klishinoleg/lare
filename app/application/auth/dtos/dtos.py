@@ -18,7 +18,7 @@ class AuthProfileDTO(BaseModelWithSafeFields):
     created_at: datetime = Field(..., description="Authorization profile Creation Date")
 
 
-class AuthInitDataDTO(BaseModel):
+class AuthInitDataDTO[BM: BaseModel](BaseModel):
     """
     DTO for incoming authentication request from a third-party provider.
 
@@ -30,7 +30,7 @@ class AuthInitDataDTO(BaseModel):
         provider_data: Dictionary with raw data needed for validation.
     """
     provider_type: AuthProviderType = Field(..., description="Type of the auth provider (e.g., TELEGRAM)")
-    provider_data: dict = Field(..., description="Raw provider-specific authentication data")
+    provider_data: BM = Field(..., description="Raw provider-specific authentication data")
 
 
 class AuthResponseDTO(BaseModel):

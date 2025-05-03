@@ -8,3 +8,4 @@ from .phrase import PhraseModel
 from .segment import SegmentModel
 from .word_chapter import WordChapterModel
 from .access_role import AccessRoleModel
+from .finance import AccountTransactionModel, AccountUsageModel, BillModel

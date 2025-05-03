@@ -1,10 +1,21 @@
 from abc import ABC, abstractmethod
-from application.abstract.events import BaseEvent
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from application.abstract.events import BaseEvent
 
 
-class BasePublisher(ABC):
+class BasePublisher[BE: "BaseEvent"](ABC):
 
     @classmethod
     @abstractmethod
-    async def publish(cls, payload: BaseEvent, group_id: str | None) -> None:
+    async def publish(cls, payload: BE, group_id: str | None) -> None:
+        ...
+
+    @classmethod
+    async def on_start(cls) -> None:
+        ...
+
+    @classmethod
+    async def on_stop(cls) -> None:
         ...

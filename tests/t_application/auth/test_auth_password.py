@@ -2,6 +2,7 @@ import pytest
 
 from application.access_control.services import Accessor
 from application.access_control.services.user_creator_service import UserCreatorService
+from application.account.services import AccountService
 from application.auth.dtos.password import PasswordRegistrationInitDataDTO, PasswordLoginInitDataDTO, \
     ChangePasswordInitDataDTO
 from application.auth.services.password_auth_service import PasswordAuthService
@@ -90,9 +91,12 @@ class TestAuthPassword:
 
     @pytest.mark.asyncio
     async def test_superuser(self) -> None:
-        superuser = await UserCreatorService.create_superuser(username="superuser", password="passw",
-                                                              public_name="Super User",
-                                                              repository_type=RepositoryTypes.MOCK)
+        try:
+            superuser = await UserCreatorService.create_superuser(username="superuser", password="passw",
+                                                                  public_name="Super User",
+                                                                  repository_type=RepositoryTypes.MOCK)
+        except AuthProfileAlreadyExistsError:
+            superuser = await AccountService().get_by_username("superuser")
         Accessor.role_repository = DIRepository.get_repository(AccessRoleRepository, RepositoryTypes.MOCK)()
         assert await Accessor.has_role(superuser, AccessRole.SUPERUSER)
         assert await Accessor.has_role(superuser, AccessRole.ADMINISTRATOR)

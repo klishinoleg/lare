@@ -2,8 +2,10 @@ from __future__ import annotations
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from aiofiles import os
+from core.enums.bot.bot_types import BotTypes
 from core.enums.dev.enviroment_types import EnviromentTypes
 from core.enums.events.broker_types import EventBrokerTypes
+from core.enums.events.streaming import EventStreamingTypes
 from core.enums.logger.logger_types import LoggersTypes
 from core.enums.repository.types import RepositoryTypes
 from core.enums.storage.deduplicator import DeduplicatorTypes
@@ -27,9 +29,12 @@ class Settings(BaseSettings):
 
     default_language: str = "en"
     tg_bot_token: str = ""
+    tg_payment_provider_token: str = ""
     web_app_url: str = ""
     database_url: str = ""
+    slave_database_url: str | None = None
     redis_url: str = ""
+    redis_event_streaming_url: str = ""
     secret_key: str = ""
     images_upload_dir: str = ""
     images_upload_url: str = ""
@@ -42,15 +47,46 @@ class Settings(BaseSettings):
     sentry_redis_url: str = ""
     sentry_secret_key: str = ""
     sentry_dsn: str = ""
+    credits_start_bonus: int = 100
+    event_streaming_timeout: float = 15
     enviroment: EnviromentTypes = EnviromentTypes.PRODUCTION
+    default_bot: BotTypes = BotTypes.TELEGRAM
+    default_event_streaming: EventStreamingTypes = EventStreamingTypes.REDIS
     loggers_type: LoggersTypes = LoggersTypes.SENTRY
     event_broker_type: EventBrokerTypes = EventBrokerTypes.KAFKA
     deduplicator_type: DeduplicatorTypes = DeduplicatorTypes.REDIS
     repository_type: RepositoryTypes = RepositoryTypes.TORTOISE
     model_config = SettingsConfigDict(env_file=Path(__file__).parent.parent / ".env", extra='ignore')
+    languages: str = ""
+    language_code: str = "en"
+    locales_dir: str = "locales"
+
+    def get_languages(self) -> tuple[tuple[str, str], ...]:
+        return tuple(lang for lang in (
+            ("en", "English"),
+            ("zh", "中文"),
+            ("es", "Español"),
+            ("ar", "العربية"),
+            ("hi", "हिंदी"),
+            ("fr", "Français"),
+            ("ru", "Русский"),
+            ("pt", "Português"),
+            ("bn", "বাংলা"),
+            ("de", "Deutsch"),
+            ("ja", "日本語"),
+            ("ko", "한국어"),
+            ("it", "Italiano"),
+            ("tr", "Türkçe"),
+            ("nl", "Nederlands"),
+        ) if lang[0] in self.languages.split("|"))
 
     def get_upload_dir(self) -> Path:
         path = Path(__file__).parent.parent / self.images_upload_dir
+        path.mkdir(exist_ok=True)
+        return path
+
+    def get_locales_dir(self) -> Path:
+        path = Path(__file__).parent / self.locales_dir
         path.mkdir(exist_ok=True)
         return path
 

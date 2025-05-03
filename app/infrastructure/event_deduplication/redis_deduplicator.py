@@ -1,6 +1,4 @@
 import redis.asyncio as aioredis
-from uuid import UUID
-
 from core.config import settings
 from infrastructure.event_deduplication.base import BaseEventDeduplicatorService
 
@@ -14,7 +12,7 @@ class RedisDeduplicatorService(BaseEventDeduplicatorService):
             cls._redis = aioredis.from_url(settings.redis_url, decode_responses=True)
         return cls._redis
 
-    async def is_duplicate(self, event_id: UUID) -> bool:
+    async def is_duplicate(self, event_id: str) -> bool:
         redis = self.get_redis()
         key = f"event:{event_id}"
         exists = await redis.exists(key)

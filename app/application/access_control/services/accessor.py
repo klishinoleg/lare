@@ -1,8 +1,5 @@
-# domain/access_control/services/authorizer.py
 from __future__ import annotations
-
 from collections import defaultdict
-
 from core.di.repository import DIRepository
 from core.enums.repository.types import RepositoryTypes
 from core.messages.exceptions import GetExMessages
@@ -25,9 +22,9 @@ class Accessor[BAL: BaseAccessValidator, E: BaseEntity]:
     role_repository: AccessRoleRepository = None
 
     @classmethod
-    async def has_role(cls, account: AccountEntity, role: AccessRole) -> bool:
-        if cls.role_repository is None:
-            return False
+    async def has_role(cls, account: AccountEntity, role: AccessRole,
+                       repository_type: RepositoryTypes = RepositoryTypes.TORTOISE) -> bool:
+        cls.init_repository(repository_type)
         return await cls.role_repository.has_role(account.id, role)
 
     @classmethod
@@ -78,6 +75,11 @@ class Accessor[BAL: BaseAccessValidator, E: BaseEntity]:
         return False
 
     @classmethod
+    def init_repository(cls, repository_type: RepositoryTypes = RepositoryTypes.TORTOISE) -> None:
+        if not cls.role_repository:
+            cls.role_repository = DIRepository.get_repository(AccessRoleRepository, repository_type)()
+
+    @classmethod
     async def or_raise(cls, entity: E, account: AccountEntity,
                        access_role: AccessRole = AccessRole.ADMINISTRATOR,
                        repository_type: RepositoryTypes = RepositoryTypes.TORTOISE
@@ -88,8 +90,7 @@ class Accessor[BAL: BaseAccessValidator, E: BaseEntity]:
         Raises:
             PermissionDenied or registered exception.
         """
-        if not cls.role_repository:
-            cls.role_repository = DIRepository.get_repository(AccessRoleRepository, repository_type)()
+        cls.init_repository(repository_type)
         if not await cls.can_edit(entity, account, access_role):
             exc = cls._exceptions.get(type(entity), PermissionDenied)
             raise exc(GetExMessages.permision_denied(entity, account))

@@ -32,7 +32,8 @@ class TelegramAuthProvider(BaseAuthProvider):
         user = provider_data.init_data_unsafe.user
         return f"TG:{user.id}:{user.username}".strip()
 
-    async def validate_and_parse(self, provider_data: TelegramProviderDataDTO) -> AuthProfileEntity:
+    async def validate_and_parse(self, provider_data: TelegramProviderDataDTO,
+                                 is_safe: bool = False) -> AuthProfileEntity:
         """
         Validate Telegram WebApp init data using bot token and HMAC check.
 
@@ -44,9 +45,11 @@ class TelegramAuthProvider(BaseAuthProvider):
 
         Raises:
             AuthProfileInvalidCredentialsError: If hash or auth_date is invalid.
+            :param provider_data:
+            :param is_safe:
         """
 
-        if not validate_telegram_init_data(provider_data):
+        if not is_safe and not validate_telegram_init_data(provider_data):
             raise AuthProfileInvalidCredentialsError(GetExMessages.telegram_invalid_hash(), field="hash")
 
         data = provider_data.init_data_unsafe.model_dump()

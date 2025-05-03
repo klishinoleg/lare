@@ -82,11 +82,12 @@ class EntityCRUDService[E: BaseEntity](ABC):
         ...
 
     @abstractmethod
-    async def delete(self, entity: E, account: E) -> bool:
+    async def delete(self, entity: E, account: E | None = None, is_system: bool = False) -> bool:
         """
         Delete an entity by its ID.
 
         Args:
+            :param is_system:
             :param entity:
             :param account:
         Returns:

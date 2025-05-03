@@ -1,19 +1,22 @@
+from typing import TYPE_CHECKING
 from core.config import settings
 from faststream.kafka import KafkaBroker
-from application.abstract.events import BaseEvent
 from infrastructure.broker.base_publisher import BasePublisher
+
+if TYPE_CHECKING:
+    from application.abstract.events import BaseEvent
 
 broker = KafkaBroker(settings.kafka_bootstrap_servers)
 
 
-class KafkaPublisher(BasePublisher):
+class KafkaPublisher[BE: "BaseEvent"](BasePublisher):
     @classmethod
-    async def publish(cls, payload: BaseEvent, group_id: str | None) -> None:
+    async def publish(cls, payload: "BE", group_id: str | None) -> None:
         """
         Publishes an event to Kafka.
 
         Args:
-            event_type (EventTypes): The type of event (topic name).
+            event_type (ChapterEventTypes): The type of event (topic name).
             payload (dict): The event data (serialized).
             :param payload:
             :param group_id:
@@ -31,3 +34,11 @@ class KafkaPublisher(BasePublisher):
         except AssertionError:
             await broker.connect()
             await publ()
+
+    @classmethod
+    async def on_start(cls) -> None:
+        await broker.connect()
+
+    @classmethod
+    async def on_stop(cls) -> None:
+        await broker.close()

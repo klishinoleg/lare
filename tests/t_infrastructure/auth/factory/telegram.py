@@ -1,32 +1,28 @@
 from datetime import datetime, timedelta
+from random import randint
 
 import factory
+from aiogram.types import User, Chat, Message
 from faker import Faker
 import json
 import hmac
 import hashlib
 from urllib.parse import quote
 from core.config import settings
-
-from infrastructure.auth.dtos.telegram import (
-    TelegramWebAppInitDTO,
-    WebAppUserDTO,
-    WebAppChatDTO,
-    TelegramProviderDataDTO
-)
+from infrastructure.auth.dtos.telegram import TelegramWebAppInitDTO, TelegramProviderDataDTO
 
 fake = Faker()
 
 
 class WebAppUserDTOFactory(factory.Factory):
     class Meta:
-        model = WebAppUserDTO
+        model = User
 
-    id = factory.Sequence(lambda n: 100000 + n)
+    id = factory.LazyFunction(lambda: randint(1000000, 9999999))
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     username = factory.Faker("user_name")
-    # is_bot = False
+    is_bot = False
     language_code = "en"
     is_premium = factory.Iterator([True, False])
     # added_to_attachment_menu = factory.Iterator([True, False])
@@ -36,13 +32,28 @@ class WebAppUserDTOFactory(factory.Factory):
 
 class WebAppChatDTOFactory(factory.Factory):
     class Meta:
-        model = WebAppChatDTO
+        model = Chat
 
     id = factory.Sequence(lambda n: 10000000 + n)
     type = factory.Iterator(["group", "supergroup", "channel"])
     title = factory.Faker("company")
     username = factory.Faker("user_name")
     photo_url = factory.Faker("image_url")
+
+
+class MessageFactory(factory.Factory):
+    class Meta:
+        model = Message
+
+    message_id = factory.Sequence(lambda n: 10000000 + n)
+    text = ""
+    chat = factory.SubFactory(WebAppChatDTOFactory),
+    from_user = factory.SubFactory(WebAppUserDTOFactory)
+    date = datetime.now()
+
+
+def get_message_from_factory(text: str, user: User | None = None, chat: Chat | None = None) -> Message:
+    return MessageFactory.build(text=text, chat=chat, from_user=user)
 
 
 class TelegramWebAppInitDTOFactory(factory.Factory):
@@ -63,12 +74,15 @@ class TelegramWebAppInitDTOFactory(factory.Factory):
     signature = "testsignature"
 
 
-def create_fake_telegram_provider_data() -> TelegramProviderDataDTO:
+def create_fake_telegram_provider_data(user_id: int | None = None) -> TelegramProviderDataDTO:
     """
     Generates a query string and HMAC hash for Telegram WebApp login flow,
     from a structured DTO. Returns full init_data and raw object.
     """
-    init_data_unsafe: TelegramWebAppInitDTO = TelegramWebAppInitDTOFactory()
+    kwargs = {}
+    if user_id is not None:
+        kwargs['user__id'] = user_id
+    init_data_unsafe: TelegramWebAppInitDTO = TelegramWebAppInitDTOFactory(**kwargs)
     raw_data = {
         k: v for k, v in init_data_unsafe.model_dump(exclude_none=True, exclude={"hash", "signature"}).items()
     }

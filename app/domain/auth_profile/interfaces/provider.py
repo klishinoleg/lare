@@ -1,16 +1,11 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TypeVar
-
 from pydantic import BaseModel
-
 from domain.auth_profile.entities import AuthProfileEntity
 from domain.auth_profile.enums import AuthProviderType
 
-BM = TypeVar("BM", bound=BaseModel)
 
-
-class BaseAuthProvider(ABC):
+class BaseAuthProvider[BM: BaseModel](ABC):
     """
     Abstract base class for external authentication providers (e.g. Telegram, WhatsApp, etc.).
 
@@ -39,7 +34,7 @@ class BaseAuthProvider(ABC):
 
     @abstractmethod
     async def validate_and_parse(
-            self, provider_data: dict
+            self, provider_data: dict, is_safe: bool = False
     ) -> AuthProfileEntity:
         """
         Validate and parse raw provider data into an AuthorizationProfileEntity.
@@ -52,6 +47,8 @@ class BaseAuthProvider(ABC):
 
         Raises:
             AuthorizationProfileInvalidCredentialsError: If data is invalid or verification fails.
+            :param provider_data:
+            :param is_safe:
         """
         ...
 

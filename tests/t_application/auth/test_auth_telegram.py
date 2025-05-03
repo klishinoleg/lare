@@ -4,7 +4,7 @@ from core.config import settings
 from core.enums.repository.types import RepositoryTypes
 from application.auth.services.auth_via_profile import AuthViaProfileService
 from domain.auth_profile.exceptions import AuthProfileInvalidCredentialsError
-from infrastructure.auth.init_auth_providers import register_auth_providers
+from core.registrators.init_auth_providers import register_auth_providers
 from tests.t_infrastructure.auth.factory.telegram import create_fake_telegram_provider_data
 from infrastructure.auth.dtos.telegram import TelegramAuthInitDataDTO
 from domain.auth_profile.enums import AuthProviderType

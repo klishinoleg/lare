@@ -42,6 +42,7 @@ class TortoiseAccountRepository(BaseTortoiseRepository[AccountEntity, AccountMod
             created_at=o.created_at
         )
 
+    @BaseTortoiseRepository.read()
     async def get_by_username(self, username: str) -> AccountEntity | None:
         """
         Retrieve an account by its username.
@@ -57,6 +58,7 @@ class TortoiseAccountRepository(BaseTortoiseRepository[AccountEntity, AccountMod
             return None
         return await self.to_entity(account)
 
+    @BaseTortoiseRepository.write()
     async def update_credits(self, account_id: int, new_credits: float) -> AccountEntity | None:
         """
         Update the credit balance for a given account ID.
