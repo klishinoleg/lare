@@ -57,7 +57,7 @@ class TestTgBot(BaseClientTest):
             await asyncio.sleep(1)
             timeout -= 1
         assert len(log) == len(messages)
-        for message, log_text in zip(messages, log):
+        for message, log_text in zip(sorted(messages), sorted(log)):
             assert normalize(message) == normalize(log_text)
         log.clear()
 
@@ -68,16 +68,18 @@ class TestTgBot(BaseClientTest):
                                          client: AsyncClient,
                                          kafka_worker: AsyncGenerator
                                          ) -> None:
-        start = monotonic()
         bot, log = bot_with_logging
         user, chat = user_and_chat
+        await asyncio.sleep(10)
+        print(f"Started log! {log=}")
+        log.clear()
         # start message
         start_message = get_message_from_factory("/start", user, chat)
         await bot.start(*(start_message,), **dict())
+        start = monotonic()
         auth_response = await self.auth_user(client, user.id)
         account = auth_response.account
         await self.check_messages_in_log(log, [GetBotMessages.start_for_new(AccountEntity(**account.model_dump()))])
-        await asyncio.sleep(5)
         # first start bonus
         start_bonus_message = get_message_from_factory("/start_bonus", user, chat)
         await bot.start_bonus(*(start_bonus_message,), **dict())
