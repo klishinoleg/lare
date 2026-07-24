@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - develop
       - codex/lazy-reader-ovh-deploy
     paths:
       - "app/**"
