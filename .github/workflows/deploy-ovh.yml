@@ -1,0 +1,232 @@
+name: Deploy Lazy Reader API to OVH
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/lazy-reader-ovh-deploy
+    paths:
+      - "app/**"
+      - "requirements.txt"
+      - "pyproject.toml"
+      - ".github/workflows/deploy-ovh.yml"
+
+concurrency:
+  group: lazy-reader-api-ovh
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      OVH_HOST: ${{ vars.OVH_HOST }}
+      OVH_USER: ${{ vars.OVH_USER }}
+      OVH_PORT: ${{ vars.OVH_PORT }}
+      DEPLOY_ROOT: /var/www/api_lazyreader_ddd
+      API_PORT: "18080"
+      TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+      TG_PAYMENT_PROVIDER_TOKEN: ${{ secrets.TG_PAYMENT_PROVIDER_TOKEN }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      READER_AI_OPENAI_API_KEY: ${{ secrets.READER_AI_OPENAI_API_KEY }}
+      GOOGLE_TTS_CREDENTIALS_JSON: ${{ secrets.GOOGLE_TTS_CREDENTIALS_JSON }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Compile source
+        run: python -m compileall -q app
+
+      - name: Prepare release archive
+        run: |
+          set -euo pipefail
+          tar \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.mypy_cache' \
+            --exclude='.pytest_cache' \
+            --exclude='.ruff_cache' \
+            --exclude='__pycache__' \
+            --exclude='*.pyc' \
+            --exclude='.venv' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            --exclude='*.env' \
+            --exclude='secrets' \
+            --exclude='tests_env/secrets' \
+            --exclude='app/local_uploads' \
+            --exclude='app/local_uploads_test' \
+            --exclude='.run' \
+            --exclude='.work-*' \
+            -czf lazy-reader-api.tar.gz app requirements.txt pyproject.toml readme.md
+
+      - name: Configure SSH
+        env:
+          OVH_SSH_PRIVATE_KEY: ${{ secrets.OVH_SSH_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$OVH_HOST"
+          test -n "$OVH_USER"
+          test -n "$OVH_PORT"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$OVH_SSH_PRIVATE_KEY" > ~/.ssh/lazy-reader-ovh
+          chmod 600 ~/.ssh/lazy-reader-ovh
+          ssh-keyscan -p "$OVH_PORT" "$OVH_HOST" >> ~/.ssh/known_hosts
+
+      - name: Render runtime secrets
+        run: |
+          set -euo pipefail
+          mkdir -p deploy-secrets
+          {
+            printf 'TG_BOT_TOKEN=%s\n' "$TG_BOT_TOKEN"
+            printf 'TG_PAYMENT_PROVIDER_TOKEN=%s\n' "$TG_PAYMENT_PROVIDER_TOKEN"
+            printf 'SECRET_KEY=%s\n' "$SECRET_KEY"
+            printf 'TELEGRAM_ADMIN_USER_IDS=%s\n' "${{ vars.TELEGRAM_ADMIN_USER_IDS }}"
+            printf 'WEB_APP_URL=%s\n' "${{ vars.WEB_APP_URL }}"
+            printf 'DATABASE_URL=%s\n' "${{ vars.DATABASE_URL }}"
+            printf 'SLAVE_DATABASE_URL=%s\n' "${{ vars.DATABASE_URL }}"
+            printf 'EVENT_BROKER_TYPE=%s\n' "${{ vars.EVENT_BROKER_TYPE }}"
+            printf 'DEFAULT_EVENT_STREAMING=%s\n' "${{ vars.DEFAULT_EVENT_STREAMING }}"
+            printf 'LANGUAGES=%s\n' "${{ vars.LANGUAGES }}"
+            printf 'IMAGES_UPLOAD_DIR=local_uploads\n'
+            printf 'IMAGES_UPLOAD_URL=uploads\n'
+            printf 'READER_AI_PROVIDER=%s\n' "${{ vars.READER_AI_PROVIDER }}"
+            printf 'READER_AI_OPENAI_API_KEY=%s\n' "$READER_AI_OPENAI_API_KEY"
+            printf 'READER_AI_OPENAI_BASE_URL=%s\n' "${{ vars.READER_AI_OPENAI_BASE_URL }}"
+            printf 'READER_AI_OPENAI_CHAT_MODEL=%s\n' "${{ vars.READER_AI_OPENAI_CHAT_MODEL }}"
+            printf 'READER_AI_VOICE_PROVIDER=%s\n' "${{ vars.READER_AI_VOICE_PROVIDER }}"
+            printf 'READER_AI_GOOGLE_TTS_LANGUAGE_CODE=%s\n' "${{ vars.READER_AI_GOOGLE_TTS_LANGUAGE_CODE }}"
+            printf 'READER_AI_GOOGLE_TTS_GENDER=%s\n' "${{ vars.READER_AI_GOOGLE_TTS_GENDER }}"
+            printf 'GOOGLE_APPLICATION_CREDENTIALS=%s\n' "${{ vars.GOOGLE_APPLICATION_CREDENTIALS }}"
+          } > deploy-secrets/app.env
+          if [ -n "$GOOGLE_TTS_CREDENTIALS_JSON" ]; then
+            printf '%s' "$GOOGLE_TTS_CREDENTIALS_JSON" > deploy-secrets/google-tts.json
+          else
+            : > deploy-secrets/google-tts.json
+          fi
+
+      - name: Upload release
+        run: |
+          set -euo pipefail
+          scp -P "$OVH_PORT" -i ~/.ssh/lazy-reader-ovh lazy-reader-api.tar.gz "$OVH_USER@$OVH_HOST:/tmp/lazy-reader-api-${GITHUB_SHA}.tar.gz"
+          scp -P "$OVH_PORT" -i ~/.ssh/lazy-reader-ovh deploy-secrets/app.env "$OVH_USER@$OVH_HOST:/tmp/lazy-reader-app.env"
+          scp -P "$OVH_PORT" -i ~/.ssh/lazy-reader-ovh deploy-secrets/google-tts.json "$OVH_USER@$OVH_HOST:/tmp/lazy-reader-google-tts.json"
+
+      - name: Deploy on OVH
+        run: |
+          set -euo pipefail
+          ssh -p "$OVH_PORT" -i ~/.ssh/lazy-reader-ovh "$OVH_USER@$OVH_HOST" "sudo GITHUB_SHA='$GITHUB_SHA' GITHUB_RUN_NUMBER='$GITHUB_RUN_NUMBER' bash -s" <<'REMOTE'
+          set -euo pipefail
+          deploy_root="/var/www/api_lazyreader_ddd"
+          release="$deploy_root/releases/${GITHUB_SHA}-${GITHUB_RUN_NUMBER}"
+          archive="/tmp/lazy-reader-api-${GITHUB_SHA}.tar.gz"
+          api_port="18080"
+
+          install -d -m 755 -o ubuntu -g ubuntu "$deploy_root/releases"
+          install -d -m 711 -o ubuntu -g ubuntu "$deploy_root/shared"
+          install -d -m 755 -o ubuntu -g ubuntu "$deploy_root/shared/.run"
+          install -d -m 755 -o ubuntu -g ubuntu "$deploy_root/shared/uploads"
+          install -d -m 700 -o ubuntu -g ubuntu "$deploy_root/shared/secrets"
+          install -m 600 -o ubuntu -g ubuntu /tmp/lazy-reader-app.env "$deploy_root/shared/app.env"
+          if [ -s /tmp/lazy-reader-google-tts.json ]; then
+            install -m 600 -o ubuntu -g ubuntu /tmp/lazy-reader-google-tts.json "$deploy_root/shared/secrets/google-tts.json"
+          fi
+
+          install -d -m 755 -o ubuntu -g ubuntu "$release"
+          tar -xzf "$archive" -C "$release"
+          ln -sfn "$deploy_root/shared/app.env" "$release/app/.env"
+          ln -sfn "$deploy_root/shared/uploads" "$release/app/local_uploads"
+
+          if [ ! -x "$deploy_root/shared/.venv/bin/python" ]; then
+            python3 -m venv "$deploy_root/shared/.venv"
+          fi
+          "$deploy_root/shared/.venv/bin/python" -m pip install --upgrade pip setuptools wheel
+          "$deploy_root/shared/.venv/bin/python" -m pip install -r "$release/requirements.txt"
+          PYTHONPATH="$release/app:$release" "$deploy_root/shared/.venv/bin/python" -m compileall -q "$release/app"
+
+          ln -sfn "$release" "$deploy_root/current"
+          chown -h ubuntu:ubuntu "$deploy_root/current"
+
+          cat >/etc/systemd/system/lazy-reader-api.service <<SERVICE
+          [Unit]
+          Description=Lazy Reader API
+          After=network.target
+
+          [Service]
+          User=ubuntu
+          Group=ubuntu
+          WorkingDirectory=$deploy_root/current/app
+          Environment=PYTHONPATH=$deploy_root/current/app:$deploy_root/current
+          Environment=GOOGLE_APPLICATION_CREDENTIALS=$deploy_root/shared/secrets/google-tts.json
+          ExecStart=$deploy_root/shared/.venv/bin/python -m uvicorn interfaces.fast_api.main:app --host 127.0.0.1 --port $api_port --workers 1
+          Restart=always
+          RestartSec=5
+          NoNewPrivileges=true
+          PrivateTmp=true
+
+          [Install]
+          WantedBy=multi-user.target
+          SERVICE
+
+          cat >/etc/nginx/sites-available/lazy-reader.conf <<NGINX
+          server {
+              listen 80;
+              server_name server.lazy-reader.com;
+
+              client_max_body_size 50m;
+
+              location /uploads/ {
+                  alias $deploy_root/shared/uploads/;
+                  access_log off;
+                  expires 7d;
+                  add_header Cache-Control "public";
+              }
+
+              location / {
+                  proxy_pass http://127.0.0.1:$api_port;
+                  proxy_http_version 1.1;
+                  proxy_set_header Host \$host;
+                  proxy_set_header X-Real-IP \$remote_addr;
+                  proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto \$scheme;
+              }
+          }
+
+          server {
+              listen 80;
+              server_name tg.lazy-reader.com;
+              root /var/www/app_letr/dist;
+              index index.html;
+
+              location / {
+                  try_files \$uri \$uri/ /index.html;
+              }
+          }
+
+          server {
+              listen 80;
+              server_name lazy-reader.com www.lazy-reader.com;
+              root /var/www/promo_lazyreader/dist;
+              index index.html;
+
+              location / {
+                  try_files \$uri \$uri/ /index.html;
+              }
+          }
+          NGINX
+
+          ln -sfn /etc/nginx/sites-available/lazy-reader.conf /etc/nginx/sites-enabled/lazy-reader.conf
+          nginx -t
+          systemctl daemon-reload
+          systemctl enable lazy-reader-api.service
+          systemctl restart lazy-reader-api.service
+          systemctl reload nginx
+          sleep 2
+          systemctl is-active --quiet lazy-reader-api.service
+          curl -fsS "http://127.0.0.1:$api_port/ready" >/dev/null
+          rm -f "$archive" /tmp/lazy-reader-app.env /tmp/lazy-reader-google-tts.json
+          REMOTE

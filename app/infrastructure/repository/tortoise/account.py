@@ -58,7 +58,6 @@ class TortoiseAccountRepository(BaseTortoiseRepository[AccountEntity, AccountMod
             return None
         return await self.to_entity(account)
 
-    @BaseTortoiseRepository.write()
     async def update_credits(self, account_id: int, new_credits: float) -> AccountEntity | None:
         """
         Update the credit balance for a given account ID.

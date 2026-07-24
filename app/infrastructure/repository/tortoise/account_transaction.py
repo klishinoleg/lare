@@ -11,6 +11,7 @@ class TortoiseAccountTransactionRepository(BaseTortoiseRepository[AccountTransac
 
     async def to_entity(self, o: AccountTransactionModel) -> AccountTransactionEntity:
         return AccountTransactionEntity(
+            id=o.id,
             account_id=o.account_id,
             transaction_type=o.transaction_type,
             credits_amount=o.credits_amount,

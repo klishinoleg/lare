@@ -3,6 +3,12 @@ from faststream import Context, FastStream
 from core.config import settings
 from faststream.kafka import KafkaBroker
 from infrastructure.broker.base_broker import BaseBroker
+from infrastructure.broker.event_outbox import (
+    OUTBOX_STATUS_DEAD_LETTERED,
+    OUTBOX_STATUS_FAILED,
+    OUTBOX_STATUS_PROCESSED,
+    EventOutboxRecorder,
+)
 
 if TYPE_CHECKING:
     from application.abstract.events import BaseEvent, BaseEventHandler
@@ -27,8 +33,26 @@ class KafkaEventBroker[BEH: "BaseEventHandler", BE: "BaseEvent"](BaseBroker):
         )
         async def kafka_handler(data: event_model,  # type:ignore[valid-type, no-untyped-def]
                                 message=Context()) -> None:
+            outbox = await EventOutboxRecorder.start(
+                data,
+                str(handler.event_handler_group),
+                None,
+            )
+            try:
+                await handler.execute(data)
+            except Exception as exc:
+                if EventOutboxRecorder.attempts_exhausted(outbox):
+                    await EventOutboxRecorder.finish(
+                        outbox,
+                        OUTBOX_STATUS_DEAD_LETTERED,
+                        str(exc),
+                    )
+                    await message.ack()
+                    return
+                await EventOutboxRecorder.finish(outbox, OUTBOX_STATUS_FAILED, str(exc))
+                raise
+            await EventOutboxRecorder.finish(outbox, OUTBOX_STATUS_PROCESSED)
             await message.ack()
-            await handler.execute(data)
 
     async def _start_broker(self) -> None:
         await self.app.run()

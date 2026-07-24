@@ -3,11 +3,12 @@ from application.book.services.book_crud_service import BookService
 from core.di.repository import DIRepository
 from core.enums.repository.types import RepositoryTypes
 from domain.book.entities import ChapterEntity
-from domain.word.entities import WordEntity
-from domain.word_chapter.entities import WordChapter
+from domain.text.word.entities import WordEntity
+from domain.text.word_chapter.entities import WordChapterEntity
 from application.book.datatypes.chapter_content import ChapterContentWordType
-from domain.word.interfaces.repository import WordRepository
-from domain.word_chapter.interfaces.repository import WordChapterRepository
+from domain.text.word.interfaces.repository import WordRepository
+from domain.text.word_chapter.interfaces.repository import WordChapterRepository
+from domain.text.word_chapter.exceptions import WordChapterEntityNotFound
 
 
 class WordChapterSaverService:
@@ -16,9 +17,26 @@ class WordChapterSaverService:
     """
 
     def __init__(self, repository_type: RepositoryTypes = RepositoryTypes.TORTOISE):
-        self.word_repo = DIRepository.get_repository(WordRepository, repository_type)()
-        self.word_chapter_repo = DIRepository.get_repository(WordChapterRepository, repository_type)()
+        self.word_repo: WordRepository = DIRepository.get_repository(WordRepository, repository_type)()
+        self.word_chapter_repo: WordChapterRepository = DIRepository.get_repository(WordChapterRepository,
+                                                                                    repository_type)()
         self.book_service = BookService(repository_type)
+
+    async def get_by_id(self, word_chapter_id: int) -> WordChapterEntity:
+        o = await self.word_chapter_repo.get_by_id(word_chapter_id)
+        if not o:
+            raise WordChapterEntityNotFound
+        return o
+
+    async def update_segment(self, word_chapter_id: int, segment_id: int) -> WordChapterEntity:
+        word_chapter_entity = await self.get_by_id(word_chapter_id)
+        word_chapter_entity.segment_id = segment_id
+        return await self.word_chapter_repo.save(word_chapter_entity)
+
+    async def update_phrase(self, word_chapter_id: int, phrase_id: int) -> WordChapterEntity:
+        word_chapter_entity = await self.get_by_id(word_chapter_id)
+        word_chapter_entity.phrase_id = phrase_id
+        return await self.word_chapter_repo.save(word_chapter_entity)
 
     async def save_words_from_chapter_content(
             self,
@@ -26,7 +44,7 @@ class WordChapterSaverService:
             content: List[ChapterContentWordType],
     ) -> None:
         """
-        Save parsed chapter content words into Word and WordChapter tables.
+        Save parsed chapter content words into Word and WordChapterEntity tables.
 
         Args:
             chapter (ChapterEntity): The ID of the chapter.
@@ -56,7 +74,7 @@ class WordChapterSaverService:
             word_entity = WordEntity(name=normalized_name, language_id=language_id)
             word = await self.word_repo.save(word_entity)
 
-        word_chapter = WordChapter(
+        word_chapter = WordChapterEntity(
             name=word_data.origin,
             word_id=word.id,
             chapter_id=chapter_id,

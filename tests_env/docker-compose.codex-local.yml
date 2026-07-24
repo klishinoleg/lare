@@ -1,0 +1,117 @@
+services:
+  codex_api:
+    build:
+      context: ..
+      dockerfile: tests_env/codex_local/Dockerfile
+    image: lazyreader/codex-local-python:latest
+    container_name: lare_codex_api
+    working_dir: /workspace
+    command: ["python", "-m", "uvicorn", "interfaces.fast_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    env_file: &codex_backend_env_files
+      - path: ./codex-local.env
+        required: false
+    environment: &codex_backend_env
+      PYTHONPATH: /workspace/app:/workspace
+      DATABASE_URL: sqlite:///workspace/.run/lazy-reader-local.sqlite3
+      SLAVE_DATABASE_URL: sqlite:///workspace/.run/lazy-reader-local.sqlite3
+      EVENT_BROKER_TYPE: kafka
+      DEFAULT_EVENT_STREAMING: mock
+      REDIS_URL: redis://redis:6379/0
+      REDIS_EVENT_STREAMING_URL: redis://redis:6379/1
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SECRET_KEY: lazy-reader-local-dev-secret
+      IMAGES_UPLOAD_DIR: local_uploads
+      IMAGES_UPLOAD_URL: uploads
+      WEB_APP_URL: https://lang-reader.ngrok.app/
+      LANGUAGES: en|zh|es|ar|hi|fr|ru|pt|bn|de|ja|ko|it|tr|nl
+    volumes: &codex_backend_volumes
+      - lazy_reader_codex_runtime:/workspace/.run
+      - lazy_reader_codex_uploads:/workspace/app/local_uploads
+      - ./secrets:/workspace/secrets:ro
+    ports:
+      - "8007:8000"
+    networks:
+      - kafka
+      - redis
+    depends_on:
+      - redis
+      - kafka
+      - kafka-topic-init
+
+  codex_kafka_segment:
+    image: lazyreader/codex-local-python:latest
+    container_name: lare_codex_kafka_segment
+    working_dir: /workspace
+    command: ["faststream", "run", "interfaces.event_broker.kafka_segment:app"]
+    env_file: *codex_backend_env_files
+    environment: *codex_backend_env
+    volumes: *codex_backend_volumes
+    networks:
+      - kafka
+      - redis
+    depends_on:
+      - redis
+      - kafka
+      - kafka-topic-init
+
+  codex_kafka_chapter:
+    image: lazyreader/codex-local-python:latest
+    container_name: lare_codex_kafka_chapter
+    working_dir: /workspace
+    command: ["faststream", "run", "interfaces.event_broker.kafka_chapter:app"]
+    env_file: *codex_backend_env_files
+    environment: *codex_backend_env
+    volumes: *codex_backend_volumes
+    networks:
+      - kafka
+      - redis
+    depends_on:
+      - redis
+      - kafka
+      - kafka-topic-init
+
+  codex_kafka_finance:
+    image: lazyreader/codex-local-python:latest
+    container_name: lare_codex_kafka_finance
+    working_dir: /workspace
+    command: ["faststream", "run", "interfaces.event_broker.kafka_finance:app"]
+    env_file: *codex_backend_env_files
+    environment: *codex_backend_env
+    volumes: *codex_backend_volumes
+    networks:
+      - kafka
+      - redis
+    depends_on:
+      - redis
+      - kafka
+      - kafka-topic-init
+
+  codex_kafka_bot:
+    image: lazyreader/codex-local-python:latest
+    container_name: lare_codex_kafka_bot
+    working_dir: /workspace
+    command: ["faststream", "run", "interfaces.event_broker.kafka_bot:app"]
+    env_file: *codex_backend_env_files
+    environment: *codex_backend_env
+    volumes: *codex_backend_volumes
+    networks:
+      - kafka
+      - redis
+    depends_on:
+      - redis
+      - kafka
+      - kafka-topic-init
+
+  codex_frontend:
+    image: lazyreader/codex-local-python:latest
+    container_name: lare_codex_frontend
+    working_dir: /frontend
+    command: ["python", "/workspace/spa_server.py", "/frontend", "5174"]
+    volumes:
+      - /mnt/c/apps/lang_reader/dist:/frontend:ro
+    ports:
+      - "5174:5174"
+
+volumes:
+  lazy_reader_codex_runtime:
+  lazy_reader_codex_uploads:

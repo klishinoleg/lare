@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from domain.word_chapter.interfaces.repository import WordChapterRepository
-from domain.word_chapter.entities import WordChapter
+from domain.text.word_chapter.interfaces.repository import WordChapterRepository
+from domain.text.word_chapter.entities import WordChapterEntity
 from infrastructure.repository.tortoise.base_repository import BaseTortoiseRepository
 from infrastructure.repository.tortoise.models import WordChapterModel
 
 
-class TortoiseWordChapterRepository(BaseTortoiseRepository[WordChapter, WordChapterModel], WordChapterRepository):
+class TortoiseWordChapterRepository(BaseTortoiseRepository[WordChapterEntity, WordChapterModel], WordChapterRepository):
     model = WordChapterModel
 
     @staticmethod
-    async def to_entity(o: WordChapterModel) -> WordChapter:
-        return WordChapter(
+    async def to_entity(o: WordChapterModel) -> WordChapterEntity:
+        return WordChapterEntity(
             id=o.id,
             name=o.name,
             word_id=o.word_id,
@@ -23,7 +23,7 @@ class TortoiseWordChapterRepository(BaseTortoiseRepository[WordChapter, WordChap
         )
 
     @BaseTortoiseRepository.read()
-    async def get_by_chapter(self, chapter_id: int) -> list[WordChapter]:
+    async def get_by_chapter(self, chapter_id: int) -> list[WordChapterEntity]:
         return [await self.to_entity(o) for o in await self.model.filter(chapter_id=chapter_id).all()]
 
     @BaseTortoiseRepository.write()

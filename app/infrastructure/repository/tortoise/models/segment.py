@@ -14,8 +14,11 @@ class SegmentModel(AbstractModel):
     ORM model representing a language-specific segment.
     """
 
+    if TYPE_CHECKING:
+        language_id: int
+
     id = fields.IntField(primary_key=True)
-    name = fields.CharField(max_length=100)
+    name = fields.TextField()
     language: fields.ForeignKeyRelation["LanguageModel"] = fields.ForeignKeyField(
         "models.LanguageModel",
         related_name="segments",

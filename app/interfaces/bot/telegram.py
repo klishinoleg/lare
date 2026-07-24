@@ -18,6 +18,7 @@ from aiogram.filters import BaseFilter
 from aiogram.types import CallbackQuery
 from core.registrators.init_auth_providers import register_auth_providers
 from core.db import init_tortoise
+from application.events.handlers_register.finance import register_finance_main_brokers
 
 
 class CallbackRegexFilter(BaseFilter):
@@ -226,6 +227,7 @@ class TelegramBot(BaseBotInterface[Message, Bot, TelegramAuthInitDataDTO]):
 async def main() -> None:
     register_auth_providers()
     await init_tortoise()
+    register_finance_main_brokers()
     bot = TelegramBot.get_instance()
     await bot.set_handlers()
     await bot.run()

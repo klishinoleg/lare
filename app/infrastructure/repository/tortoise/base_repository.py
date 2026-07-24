@@ -131,7 +131,6 @@ class BaseTortoiseRepository[E: BaseEntity, TM: AbstractModel](EntityRepository[
         await o.delete()
         return True
 
-    @write()
     async def save(self, entity: E) -> E | None:
         """
         Save (create or update) an entity to the database.

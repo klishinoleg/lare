@@ -19,6 +19,8 @@ class TransactionErrorEventHandler(BaseEventHandler[TransactionErrorEvent, Trans
         msg = event.error_message
         if event.step == FinanceEventTypes.TRANSACTION_START_BONUS:
             msg = GetBotMessages.start_bonus_already_sended()
+        if not msg:
+            return
         account_entity = await AccountService().get_by_id(event.account_id)
         bot = await DIBot.get(account_entity=account_entity)
         await bot.send_message(msg)

@@ -35,3 +35,10 @@ pytest_cache/
 /node_modules/
 /docker_develop/.env
 /app/uploads/
+/.run/
+/app/local_uploads/
+app/local_uploads_test/
+tests_env/secrets/
+tests_env/codex-local.env
+tests_env/codex_local/
+.work-*

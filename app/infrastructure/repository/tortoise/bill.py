@@ -10,6 +10,7 @@ class TortoiseBillRepository(BaseTortoiseRepository[BillEntity, BillModel], Bill
 
     async def to_entity(self, o: BillModel) -> BillEntity:
         return BillEntity(
+            id=o.id,
             account_id=o.account_id,
             credits_amount=o.credits_amount,
             cost=o.cost,

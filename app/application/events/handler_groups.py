@@ -7,3 +7,5 @@ class HandlerGroups(StrEnum):
     FINANCE = "finance_handlers"
     BOT = "bot_handlers"
     RESPONSE = "response_handlers"
+    SEGMENT = "segment_handlers"
+

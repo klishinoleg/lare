@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from domain.word.interfaces.repository import WordRepository
-from domain.word.entities import WordEntity
+from domain.text.word.interfaces.repository import WordRepository
+from domain.text.word.entities import WordEntity
 from infrastructure.repository.mock.base_repository import BaseMockRepository
 
 

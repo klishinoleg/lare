@@ -28,3 +28,13 @@ class FinanceEventTypes(EventTypes):
     TRANSACTION_START_BONUS = "finance.transaction.startbonus"
     TRANSACTION_CREATED = "finance.transaction.created"
     TRANSACTION_ERROR = "finance.transaction.error"
+
+
+class SegmentEvents(EventTypes):
+    SEGMENT_CREATE_REQUESTED = "segment.create.requested"
+    SEGMENT_CREATED = "segment.created"
+    SEGMENT_AI_REQUESTED = "segment.ai.requested"
+    SEGMENT_AI_PROCESSING = "segment.ai.processing"
+    SEGMENT_AI_RECEIVED = "segment.ai.received"
+    SEGMENT_AI_SAVED = "segment.ai.saved"
+    SEGMENT_ERROR = "segment.error"

@@ -1,0 +1,13 @@
+*.env
+app/.env
+tests_env/.env
+tests_env/codex-local.env
+tests_env/secrets/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.run/
+app/local_uploads/
+app/local_uploads_test/

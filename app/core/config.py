@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     default_language: str = "en"
     tg_bot_token: str = ""
     tg_payment_provider_token: str = ""
+    telegram_admin_user_ids: str = ""
     web_app_url: str = ""
     database_url: str = ""
     slave_database_url: str | None = None
@@ -49,6 +50,19 @@ class Settings(BaseSettings):
     sentry_dsn: str = ""
     credits_start_bonus: int = 100
     event_streaming_timeout: float = 15
+    event_outbox_max_attempts: int = 3
+    reader_ai_provider: str = "local"
+    reader_ai_openai_api_key: str = ""
+    reader_ai_openai_base_url: str = "https://api.openai.com/v1"
+    reader_ai_openai_chat_model: str = "gpt-4o-mini"
+    reader_ai_openai_image_model: str = "dall-e-3"
+    reader_ai_openai_speech_model: str = "tts-1"
+    reader_ai_openai_speech_voice: str = "alloy"
+    reader_ai_openai_image_size: str = "1024x1024"
+    reader_ai_voice_provider: str = ""
+    reader_ai_google_tts_language_code: str = "en-US"
+    reader_ai_google_tts_gender: str = "MALE"
+    google_application_credentials: str = ""
     enviroment: EnviromentTypes = EnviromentTypes.PRODUCTION
     default_bot: BotTypes = BotTypes.TELEGRAM
     default_event_streaming: EventStreamingTypes = EventStreamingTypes.REDIS

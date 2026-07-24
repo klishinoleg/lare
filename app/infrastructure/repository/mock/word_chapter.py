@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from domain.word_chapter.interfaces.repository import WordChapterRepository
-from domain.word_chapter.entities import WordChapter
+from domain.text.word_chapter.interfaces.repository import WordChapterRepository
+from domain.text.word_chapter.entities import WordChapterEntity
 from infrastructure.repository.mock.base_repository import BaseMockRepository
 
 
-class MockWordChapterRepository(BaseMockRepository[WordChapter], WordChapterRepository):
+class MockWordChapterRepository(BaseMockRepository[WordChapterEntity], WordChapterRepository):
     """
     In-memory mock implementation of WordChapterRepository for testing.
     """
 
-    async def get_by_chapter(self, chapter_id: int) -> list[WordChapter]:
+    async def get_by_chapter(self, chapter_id: int) -> list[WordChapterEntity]:
         """
         Retrieve all word chapters linked to a specific chapter.
         """

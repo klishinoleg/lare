@@ -22,6 +22,8 @@ class TransactionCreatedEventHandler(BaseEventHandler[TransactionCreatedEvent, T
             msg = GetBotMessages.add_credits_start_bonus(event.credits_amount)
         elif event.transaction_type == TransactionType.PAYMENT:
             msg = GetBotMessages.add_credits_bill(event.credits_amount)
+        if not msg:
+            return
         account_entity = await AccountService().get_by_id(event.account_id)
         bot = await DIBot.get(account_entity=account_entity)
         await bot.send_message(msg)

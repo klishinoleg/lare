@@ -124,6 +124,25 @@ services:
       - db
       - kafka-topic-init
 
+  kafka_worker_segment:
+    build:
+      context: ..
+      dockerfile: tests_env/app_workers/Dockerfile
+    image: lazyreader/kafka_worker:latest
+    restart: unless-stopped
+    command: ["faststream", "run", "interfaces.event_broker.kafka_segment:app"]
+    env_file:
+      - .env
+    networks:
+      - kafka
+      - database
+      - redis
+    depends_on:
+      - kafka_ui
+      - redis
+      - db
+      - kafka-topic-init
+
   kafka_ui:
     image: provectuslabs/kafka-ui:latest
     container_name: lare_test_kafka_ui
@@ -146,6 +165,7 @@ services:
       - init_sentry_db
       - kafka_worker_chapter
       - kafka_worker_finance
+      - kafka_worker_segment
     environment:
       DATABASE_URL: postgres://test:test@db:5432/test_db
     ports:
@@ -179,6 +199,7 @@ services:
       - app
       - kafka_worker_finance
       - kafka_worker_chapter
+      - kafka_worker_segment
     build:
       context: ..
       dockerfile: tests_env/locust/Dockerfile
