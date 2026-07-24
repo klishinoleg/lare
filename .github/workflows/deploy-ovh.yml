@@ -225,8 +225,16 @@ jobs:
           systemctl enable lazy-reader-api.service
           systemctl restart lazy-reader-api.service
           systemctl reload nginx
-          sleep 2
-          systemctl is-active --quiet lazy-reader-api.service
+          for attempt in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1:$api_port/ready" >/dev/null; then
+              break
+            fi
+            if ! systemctl is-active --quiet lazy-reader-api.service; then
+              journalctl -u lazy-reader-api.service -n 80 --no-pager
+              exit 1
+            fi
+            sleep 1
+          done
           curl -fsS "http://127.0.0.1:$api_port/ready" >/dev/null
           rm -f "$archive" /tmp/lazy-reader-app.env /tmp/lazy-reader-google-tts.json
           REMOTE
